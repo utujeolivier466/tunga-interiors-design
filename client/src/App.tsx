@@ -27,9 +27,9 @@ const WHATSAPP_URL = `https://wa.me/${TUNGA_MOBILE_RAW}?text=${encodeURIComponen
 
 const images = {
   hero: "/images/image-1.webp",
-  newProject: "/images/service/faff789656d07ca42358f8928a3fe2f6.jpg",
-  renovation: "/images/service/6a28dde5dc1b31c37bf9ab882744a69e.jpg",
-  partitions: "/images/service/6778358241d22f8b282fba51699a470d.jpg",
+  newProject: "/images/new%20service%20image/065a921dfb4f0ac687b1ce6045b486f4.jpg",
+  renovation: "/images/new%20service%20image/f132e37056e06947544a2acd7577436d.jpg",
+  partitions: "/images/new%20service%20image/bba5658cc113a0c06187054eafce8421.jpg",
 };
 
 type ProjectCategory = "All" | "New projects" | "Renovations" | "Finishes";
@@ -153,6 +153,7 @@ const navItems = [
 ];
 
 type ServiceSlug = "new-projects" | "renovations" | "partitions-finishes";
+type ServiceVisual = { src: string; alt: string };
 type ServiceDefinition = {
   slug: ServiceSlug;
   navLabel: string;
@@ -161,6 +162,7 @@ type ServiceDefinition = {
   intro: string;
   heroImage: string;
   heroImageAlt: string;
+  visuals: ServiceVisual[];
   included: string[];
   steps: string[];
   category: Exclude<ProjectCategory, "All">;
@@ -175,7 +177,15 @@ const serviceDefinitions: Record<ServiceSlug, ServiceDefinition> = {
     headline: "Interiors from first sketch to handover.",
     intro: "Homes, offices, and shops designed and built from an empty shell. Layout, finishes, lighting, and furniture handled together.",
     heroImage: images.newProject,
-    heroImageAlt: "Warm living and dining interior with layered finishes",
+    heroImageAlt: "Illustrative concept of a living room with warm lighting and layered finishes",
+    visuals: [
+      { src: "/images/new%20service%20image/0d2e8772a20543ed03002874bbd5a66e.jpg", alt: "Living room with a soft neutral palette and timber details" },
+      { src: "/images/new%20service%20image/e29515c70d7357eb12bc3d236cb7baef.jpg", alt: "Warm contemporary kitchen with layered lighting" },
+      { src: "/images/new%20service%20image/8b478f2ce32654e77e31b9533a727a84.jpg", alt: "Modern kitchen with dark cabinetry and a light worktop" },
+      { src: "/images/new%20service%20image/eb5dac35181ef4234ce08e6ccd39ad1a.jpg", alt: "Kitchen with a tiled island and warm wood accents" },
+      { src: "/images/new%20service%20image/d3390ab95e3e17a22d20fad29cda43b6.jpg", alt: "Restaurant interior with a timber ceiling and warm lighting" },
+      { src: "/images/new%20service%20image/e3ce41e9e29e9833af7f202a27510b9e.jpg", alt: "Restaurant interior with sculpted wall details and soft finishes" },
+    ],
     included: ["Design and layout of the whole interior", "Choice of materials and finishes", "A clear design direction from first idea to final finish"],
     steps: ["Tell us about your space. Send your plans or photos on WhatsApp.", "We visit, understand the brief, and agree the next step.", "We design the space, and you approve the plan before site work begins.", "Our team carries out the agreed work and walks you through the result."],
     category: "New projects",
@@ -188,7 +198,14 @@ const serviceDefinitions: Record<ServiceSlug, ServiceDefinition> = {
     headline: "Make more of the space you have.",
     intro: "We rework what you already have: better layout, better light, better materials, without rebuilding everything.",
     heroImage: images.renovation,
-    heroImageAlt: "Contemporary salon interior with styling stations",
+    heroImageAlt: "Contemporary bathroom interior with clean grey finishes",
+    visuals: [
+      { src: "/images/new%20service%20image/eb60ba21ae9e45fa893d644c7d71d147.jpg", alt: "Living room with warm wall lighting and layered seating" },
+      { src: "/images/new%20service%20image/d1a87b9f7208a4d58fe497c259aab3a0.jpg", alt: "Bedroom storage and illuminated dressing area" },
+      { src: "/images/new%20service%20image/db9c08775a784f24c60c138e8ef38abc.jpg", alt: "Restaurant interior with layered timber ceiling details" },
+      { src: "/images/new%20service%20image/942edec8fddaa3eade62aa4a4d864aee.jpg", alt: "Restaurant interior with sculpted wall niches and warm lighting" },
+      { src: "/images/new%20service%20image/6945f4dee53c38e14a64c91d00df33e9.jpg", alt: "Compact kitchen with modern cabinetry and clean finishes" },
+    ],
     included: ["A look at your current space and what can be improved", "Layout changes, partitions and ceilings", "New finishes for walls and surfaces"],
     steps: ["Show us the space. Send photos on WhatsApp, or we visit.", "We agree what will change and set a clear scope.", "Our team carries out the agreed work.", "We walk through the finished space with you at handover."],
     category: "Renovations",
@@ -201,7 +218,14 @@ const serviceDefinitions: Record<ServiceSlug, ServiceDefinition> = {
     headline: "Structure, privacy, and finish.",
     intro: "Custom partitions, shelving, wall treatments, and joinery for spaces that need structure, privacy, or a sharper look.",
     heroImage: images.partitions,
-    heroImageAlt: "Glass-framed office meeting room partition",
+    heroImageAlt: "Timber feature wall and fitted shelving detail",
+    visuals: [
+      { src: "/images/new%20service%20image/19a33711a836d0ae9facf919e0e630c8.jpg", alt: "Hallway with a geometric illuminated ceiling feature" },
+      { src: "/images/new%20service%20image/1aeff103a35f00e65d3803e71618450e.jpg", alt: "Restaurant booth area divided by timber slat screens" },
+      { src: "/images/new%20service%20image/a0df66c467b3784d415f7bda26b1aa8d.jpg", alt: "Timber media wall with built-in display shelves" },
+      { src: "/images/new%20service%20image/29d9b0410f620ced32bebefa5e89a485.jpg", alt: "Kitchen cabinetry with integrated lighting and stone finishes" },
+      { src: "/images/new%20service%20image/ef5b0bc38806ca5bb83e6dde2d7fbd29.jpg", alt: "Cafe interior with green seating and a display counter" },
+    ],
     included: ["Partitions for offices and rooms", "Ceilings and spatial transitions", "Finishes that give walls and surfaces their character"],
     steps: ["Tell us what you need to divide or finish. Send photos or measurements on WhatsApp.", "We visit, measure and agree the scope.", "You choose the layout and materials with our guidance.", "Our team installs the agreed work and walks you through it at handover."],
     category: "Finishes",
@@ -654,9 +678,6 @@ function PageIntro({ page }: { page: "services" | "studio" }) {
 }
 
 function ServicePage({ service, onQuote }: { service: ServiceDefinition; onQuote: (service: string) => void }) {
-  const [spaceType, setSpaceType] = useState("All");
-  const serviceProjects = projects.filter((project) => project.category === service.category && (spaceType === "All" || project.spaceType === spaceType));
-  const spaceTypes = ["All", "House", "Office", "Hotel", "Apartment"];
   const whatsappUrl = `https://wa.me/${TUNGA_MOBILE_RAW}?text=${encodeURIComponent(service.quoteMessage)}`;
   return (
     <>
@@ -673,23 +694,21 @@ function ServicePage({ service, onQuote }: { service: ServiceDefinition; onQuote
       </section>
       <section className="service-included section-cream"><div className="container service-content-grid"><div><SectionLabel index="01" children="What’s included" /><h2>The right layers, <em>in place.</em></h2></div><div className="included-list">{service.included.map((item, index) => <div className="included-item" key={item}><span>0{index + 1}</span><p>{item}</p></div>)}</div></div></section>
       <section className="service-steps section-dark"><div className="container service-content-grid"><div><SectionLabel index="02" children="How it works" /><h2>A clear way <em>through.</em></h2></div><div className="steps-list">{service.steps.map((step, index) => <div className="step-item" key={step}><span>0{index + 1}</span><p>{step}</p></div>)}</div></div></section>
-      <section className="service-projects section-cream">
+      <section className="service-visual-inspiration section-dark" aria-labelledby="service-visuals-title">
         <div className="container">
-          <div className="projects-heading">
-            <div><SectionLabel index="03" children="Our projects" /><h2>Spaces with <em>a point of view.</em></h2></div>
-            <p className="projects-intro">A selection of work connected to {service.navLabel.toLowerCase()}.</p>
-          </div>
-          <div className="service-filter-note">
-            <span>Showing</span>
-            <strong>{service.navLabel}</strong>
-            <div className="service-type-filter">
-              {spaceTypes.map((type) => <button type="button" className={spaceType === type ? "active" : ""} onClick={() => setSpaceType(type)} key={type}>{type}</button>)}
+          <div className="service-visuals-heading">
+            <div>
+              <SectionLabel index="03" children="Design references" />
+              <h2 id="service-visuals-title" className="line-reveal"><HeadlineLine>Ideas for</HeadlineLine><HeadlineLine><em>considered spaces.</em></HeadlineLine></h2>
             </div>
+            <p>Illustrative interior concepts for material, lighting, and layout inspiration. These are references, not photographs of Tunga completed projects.</p>
           </div>
-          <div className="project-grid service-project-grid">
-            {serviceProjects.length ? serviceProjects.map((project) => (
-              <ProjectCard key={project.title} project={project} label={project.spaceType} servicePreview />
-            )) : <p className="no-projects">More spaces in this category are taking shape.</p>}
+          <div className="service-visuals-grid">
+            {service.visuals.map((visual) => (
+              <figure className="service-visuals-item image-reveal" key={visual.src}>
+                <img src={visual.src} alt={visual.alt} loading="lazy" decoding="async" sizes="(min-width: 900px) 33vw, (min-width: 620px) 50vw, 100vw" />
+              </figure>
+            ))}
           </div>
         </div>
       </section>
