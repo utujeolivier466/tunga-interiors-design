@@ -824,12 +824,23 @@ function ContactMap() {
   );
 }
 
-function PageIntro({ page }: { page: "services" | "studio" }) {
-  const copy = {
-    services: ["02 / What we do", "Spaces, shaped", "with intent.", "New projects, renovations, and interior finishes for homes and commercial spaces in Kigali."],
-    studio: ["04 / The studio", "A measured eye.", "A local point of view.", "Tunga Interiors is a Kigali interior design and fit-out studio led by James Manzi."],
-  }[page];
+function PageIntro() {
+  const copy = ["04 / The studio", "A measured eye.", "A local point of view.", "Tunga Interiors is a Kigali interior design and fit-out studio led by James Manzi."];
   return <section className="page-intro section-dark"><div className="container"><span className="eyebrow">{copy[0]}</span><h1 className="line-reveal"><HeadlineLine>{copy[1]}</HeadlineLine><HeadlineLine><em>{copy[2]}</em></HeadlineLine></h1><p>{copy[3]}</p></div></section>;
+}
+
+function ServicesOverviewHero() {
+  return (
+    <section className="services-overview-hero" aria-labelledby="services-overview-title">
+      <img className="services-overview-hero-image" src="/images/service/faff789656d07ca42358f8928a3fe2f6.jpg" alt="" aria-hidden="true" fetchPriority="high" decoding="async" />
+      <div className="services-overview-hero-overlay" aria-hidden="true" />
+      <div className="services-overview-hero-copy">
+        <span className="eyebrow">02 / What we do</span>
+        <h1 id="services-overview-title">Spaces, shaped <em>with intent.</em></h1>
+        <p>New projects, renovations, and interior finishes for homes and commercial spaces in Kigali.</p>
+      </div>
+    </section>
+  );
 }
 
 function Breadcrumbs({ items }: { items: { label: string; href?: string }[] }) {
@@ -852,14 +863,24 @@ function ServicePage({ service, onQuote }: { service: ServiceDefinition; onQuote
   return (
     <>
       <section className="service-page-hero section-dark">
+        <img
+          className="service-page-hero-image"
+          src={service.heroImage}
+          alt={service.heroImageAlt}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
+        <div className="service-page-hero-overlay" aria-hidden="true" />
         <div className="container service-page-hero-grid">
-          <div className="service-page-copy"><span className="eyebrow">{service.label}</span><h1 className="line-reveal"><HeadlineLine>{service.headline}</HeadlineLine></h1><p>{service.intro}</p><div className="service-page-actions"><button className="button button-gold" type="button" onClick={() => onQuote(service.navLabel)}>Request a quote <ArrowUpRight size={16} /></button><a className="text-link text-link-light" href={`/projects?service=${encodeURIComponent(service.category)}`}>See our work <ArrowDownRight size={17} /></a></div></div>
-          <div className="service-page-visual image-reveal">
-            <img src={service.heroImage} alt={service.heroImageAlt} loading="eager" decoding="async" />
-            <span className="image-corner corner-top" />
-            <span className="image-corner corner-bottom" />
-            <div className="service-page-index">{service.slug === "new-projects" ? "01" : service.slug === "renovations" ? "02" : "03"}<span> / 03</span></div>
+          <div className="service-page-copy">
+            <span className="eyebrow">{service.label}</span>
+            <h1 className="line-reveal"><HeadlineLine>{service.headline}</HeadlineLine></h1>
+            <p>{service.intro}</p>
           </div>
+        </div>
+        <div className="service-page-index" aria-label={`Service ${service.slug === "new-projects" ? "one" : service.slug === "renovations" ? "two" : "three"} of three`}>
+          {service.slug === "new-projects" ? "01" : service.slug === "renovations" ? "02" : "03"}<span> / 03</span>
         </div>
       </section>
       <section className="service-included section-cream"><div className="container service-content-grid"><div><SectionLabel index="01" children="What’s included" /><h2>The right layers, <em>in place.</em></h2></div><div className="included-list">{service.included.map((item, index) => <div className="included-item" key={item}><span>0{index + 1}</span><p>{item}</p></div>)}</div></div></section>
@@ -1243,7 +1264,8 @@ function App() {
       {!isNotFound && projectDetail && <ProjectDetail project={projectDetail} onQuote={openQuote} scrollTo={scrollTo} />}
       {!isNotFound && servicePage && <ServicePage service={servicePage} onQuote={openQuote} />}
       {!isNotFound && !servicePage && !projectDetail && isThankYou && <ThankYouPage />}
-      {!servicePage && !isHome && page && page !== "projects" && page !== "contact" && <PageIntro page={page} />}
+      {!servicePage && activePage === "services" && <ServicesOverviewHero />}
+      {!servicePage && activePage === "studio" && <PageIntro />}
       {!servicePage && isHome && <section className="hero" aria-labelledby="hero-title">
         <img className="hero-image" src={images.hero} alt="" aria-hidden="true" loading="eager" fetchPriority="high" decoding="async" />
         <div className="hero-overlay" />
@@ -1297,9 +1319,18 @@ function App() {
       {!isNotFound && !servicePage && (isHome || activePage === "services") && <section className="services section-cream" id="services">
         <div className="container">
           <div className="section-heading reveal">
-            <SectionLabel index="02" children="What we do" />
-            <h2 className="line-reveal"><HeadlineLine>Spaces, shaped</HeadlineLine><HeadlineLine><em>with intent.</em></HeadlineLine></h2>
-            <p>Three ways we can help you make a space feel more like itself.</p>
+            <SectionLabel index="02" children={activePage === "services" ? "Choose a service" : "What we do"} />
+            {activePage === "services" ? (
+              <>
+                <h2 className="line-reveal"><HeadlineLine>A clear place</HeadlineLine><HeadlineLine><em>to start.</em></HeadlineLine></h2>
+                <p>Three ways we can help you make a space feel more like itself.</p>
+              </>
+            ) : (
+              <>
+                <h2 className="line-reveal"><HeadlineLine>Spaces, shaped</HeadlineLine><HeadlineLine><em>with intent.</em></HeadlineLine></h2>
+                <p>Three ways we can help you make a space feel more like itself.</p>
+              </>
+            )}
           </div>
           <div className="services-list">
             <article className="service-card reveal" onClick={() => { window.location.href = "/services/new-projects"; }} role="link" tabIndex={0}>
