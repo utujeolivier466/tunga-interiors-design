@@ -597,16 +597,21 @@ h1 em, h2 em { color: var(--gold-light); font-style: italic; }
 .quote-modal { position: relative; display: flex; flex-direction: column; width: min(760px, 94vw); height: min(90vh, 720px); background: var(--paper); color: var(--ink); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35); animation: modal-rise 420ms var(--ease) both; overflow: hidden; }
 .quote-close { position: absolute; top: 16px; right: 16px; display: inline-flex; align-items: center; justify-content: center; width: 37px; height: 37px; border: 1px solid rgba(22, 24, 21, 0.2); background: transparent; color: var(--ink); transition: background 180ms ease, color 180ms ease; z-index: 2; }
 .quote-close:hover { background: var(--ink); color: var(--paper); }
+.quote-close-inline { position: static; flex: 0 0 auto; }
 .quote-header { flex: 0 0 auto; padding: 24px 48px 0; }
-.quote-topline { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 0 64px 12px 0; border-bottom: 1px solid var(--line-light); color: rgba(22, 24, 21, 0.48); font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
-.quote-topline span:last-child { color: var(--gold); }
 .quote-heading { padding: 22px 0 16px; }
 .quote-heading.compact { padding: 18px 0 12px; }
 .quote-heading h2 { max-width: 560px; margin: 0; font-size: clamp(28px, 4vh, 40px); line-height: 1.1; }
 .quote-heading h2 em { color: rgba(22, 24, 21, 0.62); }
-.quote-heading p { max-width: 390px; margin: 12px 0 0; color: rgba(22, 24, 21, 0.57); font-size: 12px; line-height: 1.6; }
+.quote-heading-row { display: flex; align-items: center; gap: 16px; padding: 0 0 14px; border-bottom: 1px solid var(--line-light); }
+.quote-heading-row h2 { flex: 1 1 auto; min-width: 0; font-size: clamp(24px, 4vh, 36px); white-space: nowrap; }
+.quote-heading-row h2 em { color: rgba(22, 24, 21, 0.62); }
+.quote-step-count { flex: 0 0 auto; color: var(--gold-text); font-size: 13px; font-weight: 700; letter-spacing: 0.1em; }
+.quote-draft-notice { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0 0; color: #454138; font-size: 14px; line-height: 1.45; }
+.quote-draft-notice.has-error { color: #a13d32; }
+.quote-draft-notice button { flex: 0 0 auto; padding: 0; border: 0; background: transparent; color: var(--gold-text); font-size: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .quote-progress { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 16px 48px 18px; border-top: 1px solid var(--line-light); border-bottom: 1px solid var(--line-light); flex-shrink: 0; }
-.progress-step { position: relative; display: flex; align-items: center; gap: 9px; padding: 0 0 18px; border: 0; background: transparent; color: rgba(22, 24, 21, 0.62); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-align: left; transition: color 180ms ease; }
+.progress-step { position: relative; display: flex; align-items: center; gap: 9px; padding: 0 0 18px; border: 0; background: transparent; color: #514c43; font-size: 12px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; text-align: left; transition: color 180ms ease; }
 .progress-step::after { position: absolute; right: 10px; left: 33px; bottom: 0; height: 2px; background: var(--gold); content: ''; opacity: 0; transform: scaleX(0); transform-origin: left; transition: opacity 180ms ease, transform 350ms var(--ease); }
 .progress-step.active { color: var(--ink); }
 .progress-step.completed { color: var(--ink); }
@@ -632,26 +637,26 @@ h1 em, h2 em { color: var(--gold-light); font-style: italic; }
 .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 14px; }
 .field { display: flex; flex-direction: column; gap: 8px; }
 .field.full { grid-column: 1 / -1; }
-.field > span { color: rgba(22, 24, 21, 0.56); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
-.field > span small { color: rgba(22, 24, 21, 0.38); font-size: inherit; font-weight: 400; letter-spacing: 0; text-transform: none; }
+.field > span { color: #454138; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.field > span small { color: #625c51; font-size: inherit; font-weight: 500; letter-spacing: 0; text-transform: none; }
 .field input, .field select, .field textarea { width: 100%; border: 0; border-bottom: 1px solid rgba(22, 24, 21, 0.3); border-radius: 0; padding: 9px 0 11px; outline: none; background: transparent; color: var(--ink); font: 16px var(--serif); transition: border-color 180ms ease; }
 .field select { appearance: none; padding-right: 26px; background: linear-gradient(45deg, transparent 50%, var(--gold-text) 50%) calc(100% - 7px) 50% / 5px 5px no-repeat, linear-gradient(135deg, var(--gold-text) 50%, transparent 50%) 100% 50% / 5px 5px no-repeat; }
 .field textarea { resize: vertical; line-height: 1.5; }
 .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); }
 .field input::placeholder, .field textarea::placeholder { color: var(--placeholder); }
 input:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px #e6e2d8 inset; -webkit-text-fill-color: #111; }
-.field-note { max-width: 480px; margin: 25px 0 0; color: rgba(22, 24, 21, 0.7); font-size: 11px; line-height: 1.65; }
+.field-note { max-width: 480px; margin: 25px 0 0; color: #454138; font-size: 14px; line-height: 1.65; }
 .quote-summary { display: flex; flex-direction: column; gap: 0; margin-top: 28px; padding: 0 0 0 16px; border-left: 3px solid var(--gold); background: rgba(22, 24, 21, 0.02); }
 .quote-summary-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(22, 24, 21, 0.1); }
 .quote-summary-row:last-child { border-bottom: 0; }
-.quote-summary-row span { color: rgba(22, 24, 21, 0.52); font-size: 8px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+.quote-summary-row span { color: #514c43; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
 .quote-summary-row > div { display: flex; align-items: center; gap: 10px; }
 .quote-summary-row strong { font-family: var(--serif); font-size: 17px; font-weight: 500; }
-.summary-edit { padding: 0; border: 0; background: transparent; color: var(--ink); font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.summary-edit { padding: 0; border: 0; background: transparent; color: var(--gold-text); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 .quote-actions { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 16px 48px 20px; border-top: 1px solid var(--line-light); }
-.modal-text-button { display: inline-flex; align-items: center; gap: 7px; padding: 0; background: transparent; color: rgba(22, 24, 21, 0.59); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.modal-text-button { display: inline-flex; align-items: center; gap: 7px; padding: 0; background: transparent; color: #454138; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 .modal-text-button:hover { color: var(--ink); }
-.required-note { color: rgba(22, 24, 21, 0.4); font-size: 10px; }
+.required-note { color: #514c43; font-size: 12px; }
 .quote-actions .button:disabled { cursor: not-allowed; opacity: 1; transform: none; background: rgba(22, 24, 21, 0.35); color: rgba(241, 237, 229, 0.9); }
 .quote-success { display: flex; flex: 1 1 auto; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%; min-height: 0; overflow-y: auto; padding: 64px 48px 48px; }
 .success-mark { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; margin-bottom: 26px; border: 1px solid var(--gold); background: rgba(200, 164, 106, 0.05); color: var(--gold); }
@@ -674,13 +679,13 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px #e6e2d8 inset; -webkit
   .quote-backdrop { align-items: flex-end; padding: 0; }
   .quote-modal { height: calc(100vh - 18px); }
   .quote-header { padding-left: 20px; padding-right: 20px; }
-  .quote-topline { padding-right: 42px; }
   .quote-close { top: 16px; right: 16px; width: 33px; height: 33px; }
-  .quote-heading { padding: 34px 0 25px; }
-  .quote-heading h2 { font-size: 52px; }
-  .quote-heading p { max-width: 300px; }
+  .quote-heading-row { gap: 8px; padding-bottom: 12px; }
+  .quote-heading-row h2 { font-size: clamp(18px, 4.8vw, 27px); }
+  .quote-step-count { font-size: 11px; letter-spacing: 0.06em; }
+  .quote-close-inline { width: 33px; height: 33px; }
   .quote-progress { gap: 3px; padding-left: 20px; padding-right: 20px; }
-  .progress-step { gap: 5px; font-size: 7px; letter-spacing: 0.04em; }
+  .progress-step { gap: 5px; font-size: 9px; letter-spacing: 0.03em; }
   .progress-step > span { font-size: 15px; }
   .progress-step::after { left: 25px; }
   .quote-body { min-height: 270px; padding: 30px 20px 0; }
@@ -908,13 +913,13 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px #e6e2d8 inset; -webkit
 .field > span { color: var(--ink-muted); font-size: 12px; letter-spacing: 0.12em; }
 .field input, .field select, .field textarea { font-size: 16px; }
 .field input::placeholder, .field textarea::placeholder { color: var(--placeholder); }
-.quote-heading p { color: var(--ink-muted); font-size: 14px; }
-.quote-topline { font-size: 11px; letter-spacing: 0.12em; }
-.progress-step { font-size: 10px; }
-.choice-card small { color: var(--ink-muted); font-size: 15px; }
-.quote-summary-row span { font-size: 10px; }
-.summary-edit { color: var(--gold-text); font-size: 11px; }
-.quote-modal .eyebrow, .quote-modal .quote-topline span:last-child,
+.progress-step { font-size: 12px; }
+.field > span { color: #454138; font-size: 14px; letter-spacing: 0.08em; }
+.field-note { color: #454138; font-size: 14px; }
+.choice-card small { color: #454138; font-size: 15px; }
+.quote-summary-row span { color: #514c43; font-size: 12px; }
+.summary-edit { color: var(--gold-text); font-size: 12px; }
+.quote-modal .eyebrow, .quote-modal .quote-step-count,
 .quote-modal .progress-step > span, .quote-modal .success-mark {
   color: var(--gold-text);
 }
