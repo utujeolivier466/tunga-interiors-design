@@ -415,15 +415,7 @@ function StudioStaggerGallery() {
   }, []);
 
   return (
-    <section className="studio-concepts" aria-labelledby="studio-concepts-title">
-      <div className="studio-concepts-heading">
-        <div>
-          <span className="eyebrow">DESIGN DIRECTION / CONCEPT VISUALS</span>
-          <h2 className="line-reveal" id="studio-concepts-title"><HeadlineLine>Ideas for</HeadlineLine><HeadlineLine><em>considered spaces.</em></HeadlineLine></h2>
-          <p>Illustrative concepts, not photographs of completed projects. Explore our built work in the project gallery.</p>
-        </div>
-        <a className="text-link" href="/projects">See all projects <ArrowUpRight size={16} /></a>
-      </div>
+    <section className="studio-concepts" aria-label="Interior design concepts">
       <div className="studio-stagger-gallery" ref={galleryRef}>
         {studioGalleryItems.map((item) => (
           <figure
@@ -1377,10 +1369,6 @@ function App() {
               </a>
             </div>
           </div>
-          <a className="hero-scroll" href="/services" aria-label="Open services page">
-            <span>Scroll to explore</span>
-            <ArrowDownRight size={17} strokeWidth={1.4} />
-          </a>
         </div>
       </section>}
 
@@ -1407,19 +1395,14 @@ function App() {
 
       {!isNotFound && !servicePage && (isHome || activePage === "services") && <section className="services section-cream" id="services">
         <div className="container">
-          <div className="section-heading reveal">
+          <div className={`section-heading reveal${activePage === "services" ? "" : " section-heading--home"}`}>
             <SectionLabel index="02" children={activePage === "services" ? "Choose a service" : "What we do"} />
             {activePage === "services" ? (
               <>
                 <h2 className="line-reveal"><HeadlineLine>A clear place</HeadlineLine><HeadlineLine><em>to start.</em></HeadlineLine></h2>
                 <p>Three ways we can help you make a space feel more like itself.</p>
               </>
-            ) : (
-              <>
-                <h2 className="line-reveal"><HeadlineLine>Spaces, shaped</HeadlineLine><HeadlineLine><em>with intent.</em></HeadlineLine></h2>
-                <p>Three ways we can help you make a space feel more like itself.</p>
-              </>
-            )}
+            ) : null}
           </div>
           <div className="services-list">
             <article className="service-card reveal" onClick={() => { window.location.href = "/services/new-projects"; }} role="link" tabIndex={0}>
@@ -1491,19 +1474,9 @@ function App() {
 
       {!isNotFound && !projectDetail && !servicePage && (isHome || activePage === "projects" || activePage === "services") && <section className="projects section-dark" id="projects">
         <div className="container">
-          <div className="projects-heading reveal">
-            {activePage === "projects" || activePage === "services" ? (
-              <h2>Our projects</h2>
-            ) : (
-              <>
-                <div>
-                  <SectionLabel index="03" children="Selected work" />
-                  <h2 className="line-reveal"><HeadlineLine>Selected</HeadlineLine><HeadlineLine><em>spaces.</em></HeadlineLine></h2>
-                </div>
-                <p className="projects-intro">Recent work across homes, offices, and retail. {projects.length} projects and counting.</p>
-              </>
-            )}
-          </div>
+          {!isHome && <div className="projects-heading reveal">
+            <h2>Our projects</h2>
+          </div>}
           {activePage === "projects" && (
             <div className="project-index-filter">
               <div className="container project-index-filter-inner">
@@ -1526,7 +1499,7 @@ function App() {
             </div>
           )}
           {isHome ? (
-            <>
+            <div className="home-projects-content">
               <div className="filter-bar home-filter-bar">
                 <span className="filter-label">Explore by space</span>
                 <div className="filter-options" aria-label="Filter projects by space type">
@@ -1549,7 +1522,7 @@ function App() {
               ) : (
                 <p className="portfolio-empty">Hospitality projects are not yet featured in the gallery.</p>
               )}
-            </>
+            </div>
           ) : (
             <div className={`project-grid ${activePage === "projects" ? "project-index-grid" : ""}`}>
               {visibleProjects.map((project) => (
@@ -1557,12 +1530,12 @@ function App() {
               ))}
             </div>
           )}
-          <div className="projects-footer reveal">
+          {!isHome && <div className="projects-footer reveal">
             <span>More spaces in the making</span>
             <a className="text-link text-link-light" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
               Start your project <ArrowUpRight size={16} strokeWidth={1.4} />
             </a>
-          </div>
+          </div>}
         </div>
       </section>}
 
@@ -1688,10 +1661,16 @@ function App() {
         </div>
       </footer>
 
-      {activePage !== "contact" && <a className="floating-whatsapp" href={WHATSAPP_URL} target="_blank" rel="noreferrer" aria-label="Chat with Tunga Interiors on WhatsApp">
-        <MessageCircle size={20} strokeWidth={1.7} />
-        <span>WhatsApp us</span>
-      </a>}
+      {activePage !== "contact" && <div className="floating-actions">
+        <button className="floating-project" type="button" onClick={() => openQuote()} aria-label="Start a project">
+          <span>Start a project</span>
+          <ArrowUpRight size={17} strokeWidth={1.6} />
+        </button>
+        <a className="floating-whatsapp" href={WHATSAPP_URL} target="_blank" rel="noreferrer" aria-label="Chat with Tunga Interiors on WhatsApp">
+          <MessageCircle size={20} strokeWidth={1.7} />
+          <span>WhatsApp us</span>
+        </a>
+      </div>}
       <QuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} initialService={quoteService} initialNotes={quoteNotes} />
     </main>
   );
