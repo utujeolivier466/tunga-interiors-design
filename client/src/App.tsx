@@ -343,6 +343,18 @@ type QuoteData = {
 };
 
 const initialQuoteData: QuoteData = { service: "", property: "", location: "", scope: "", timeline: "", name: "", phone: "", email: "", notes: "" };
+const QUOTE_DRAFT_KEY = "tunga-quote-draft";
+const QUOTE_DRAFT_TTL = 7 * 24 * 60 * 60 * 1000;
+
+type QuoteDraft = { step: number; data: QuoteData; expiresAt: number };
+
+function isQuoteDraft(value: unknown): value is QuoteDraft {
+  if (!value || typeof value !== "object") return false;
+  const draft = value as Partial<QuoteDraft>;
+  return Number.isInteger(draft.step) && draft.step! >= 1 && draft.step! <= 4
+    && typeof draft.expiresAt === "number" && draft.expiresAt > Date.now()
+    && Boolean(draft.data) && Object.keys(initialQuoteData).every((key) => typeof draft.data?.[key as keyof QuoteData] === "string");
+}
 
 const quoteServices = [  { title: "New project", detail: "A space from first idea to final finish" },
   { title: "Renovation", detail: "Reworking what is already there" },
@@ -928,24 +940,99 @@ function QuoteModal({ open, onClose, initialService = "", initialNotes = "" }: {
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [data, setData] = useState<QuoteData>(initialQuoteData);
+  const [readySession, setReadySession] = useState(0);
+  const [draftRestored, setDraftRestored] = useState(false);
+  const [draftStorageError, setDraftStorageError] = useState(false);
+  const sessionId = useRef(0);
 
   useEffect(() => {
     if (open) {
-      setStep(1);
+      const currentSession = ++sessionId.current;
+      setReadySession(0);
       setSubmitted(false);
-      setData({ ...initialQuoteData, service: initialService, notes: initialNotes });
+      setDraftRestored(false);
+      try {
+        const saved = localStorage.getItem(QUOTE_DRAFT_KEY);
+        if (saved) {
+          const parsed: unknown = JSON.parse(saved);
+          if (isQuoteDraft(parsed)) {
+            setStep(parsed.step);
+            setData(parsed.data);
+            setDraftRestored(true);
+          } else {
+            localStorage.removeItem(QUOTE_DRAFT_KEY);
+            setStep(1);
+            setData({ ...initialQuoteData, service: initialService, notes: initialNotes });
+          }
+        } else {
+          setStep(1);
+          setData({ ...initialQuoteData, service: initialService, notes: initialNotes });
+        }
+        setDraftStorageError(false);
+      } catch (error) {
+        console.error("Unable to restore the saved quote draft.", error);
+        setDraftStorageError(true);
+        setStep(1);
+        setData({ ...initialQuoteData, service: initialService, notes: initialNotes });
+      }
       document.body.style.overflow = "hidden";
+      setReadySession(currentSession);
     } else {
       document.body.style.overflow = "";
     }
     return () => { document.body.style.overflow = ""; };
   }, [open, initialService, initialNotes]);
 
+  useEffect(() => {
+    if (!open || submitted || !readySession || readySession !== sessionId.current) return;
+    const hasDraftContent = step > 1 || Object.values(data).some(Boolean);
+    try {
+      if (hasDraftContent) {
+        localStorage.setItem(QUOTE_DRAFT_KEY, JSON.stringify({
+          step,
+          data,
+          expiresAt: Date.now() + QUOTE_DRAFT_TTL,
+        } satisfies QuoteDraft));
+      } else {
+        localStorage.removeItem(QUOTE_DRAFT_KEY);
+      }
+      setDraftStorageError(false);
+    } catch (error) {
+      console.error("Unable to save the quote draft.", error);
+      setDraftStorageError(true);
+    }
+  }, [open, submitted, readySession, step, data]);
+
   if (!open) return null;
   const update = (key: keyof QuoteData, value: string) => setData((current) => ({ ...current, [key]: value }));
   const canContinue = (step === 1 && Boolean(data.service)) || (step === 2 && Boolean(data.property && data.location)) || (step === 3 && Boolean(data.scope && data.timeline)) || (step === 4 && Boolean(data.name && data.phone));
   const whatsappMessage = `Hi Tunga, I’m ${data.name || "interested in a project"}. I’d like to discuss ${data.service || "an interior project"} in ${data.location || "Kigali"}. My brief: ${data.scope || "to be discussed"}; timing: ${data.timeline || "to be discussed"}.${data.notes ? ` Additional details: ${data.notes}` : ""}`;
-  const continueStep = () => step < 4 ? setStep((current) => current + 1) : setSubmitted(true);
+  const continueStep = () => {
+    if (step < 4) {
+      setStep((current) => current + 1);
+      return;
+    }
+    try {
+      localStorage.removeItem(QUOTE_DRAFT_KEY);
+    } catch (error) {
+      console.error("Unable to remove the submitted quote draft.", error);
+      setDraftStorageError(true);
+    }
+    setDraftRestored(false);
+    setSubmitted(true);
+  };
+  const startOver = () => {
+    try {
+      localStorage.removeItem(QUOTE_DRAFT_KEY);
+      setDraftStorageError(false);
+    } catch (error) {
+      console.error("Unable to clear the saved quote draft.", error);
+      setDraftStorageError(true);
+    }
+    setDraftRestored(false);
+    setStep(1);
+    setData(initialQuoteData);
+  };
 
   const summaryRows = [
     { label: "Service", value: data.service || "Not chosen" },
@@ -959,36 +1046,38 @@ function QuoteModal({ open, onClose, initialService = "", initialNotes = "" }: {
   return (
     <div className="quote-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section className="quote-modal" role="dialog" aria-modal="true" aria-labelledby="quote-title">
-        <button className="quote-close" type="button" onClick={onClose} aria-label="Close request a quote form"><X size={20} /></button>
         {submitted ? (
-          <div className="quote-success modal-success">
-            <div className="success-mark"><CheckCircle2 size={26} strokeWidth={2} /></div>
-            <span className="eyebrow">Brief received</span>
-            <h2>Thanks, {firstName}.</h2>
-            <p className="success-body">We’ll message you on WhatsApp within 24 hours.</p>
-            <div className="success-steps" aria-label="What happens next">
-              <div><span>1</span><p>We review your brief.</p></div>
-              <div><span>2</span><p>We reach out to agree a site visit.</p></div>
-              <div><span>3</span><p>You get a concept and a clear budget.</p></div>
+          <>
+            <button className="quote-close" type="button" onClick={onClose} aria-label="Close request a quote form"><X size={20} /></button>
+            <div className="quote-success modal-success">
+              <div className="success-mark"><CheckCircle2 size={26} strokeWidth={2} /></div>
+              <span className="eyebrow">Brief received</span>
+              <h2>Thanks, {firstName}.</h2>
+              <p className="success-body">We’ll message you on WhatsApp within 24 hours.</p>
+              <div className="success-steps" aria-label="What happens next">
+                <div><span>1</span><p>We review your brief.</p></div>
+                <div><span>2</span><p>We reach out to agree a site visit.</p></div>
+                <div><span>3</span><p>You get a concept and a clear budget.</p></div>
+              </div>
+              <div className="success-actions">
+                <div className="success-callout">Want a faster reply? Send your brief directly.</div>
+                <a className="button button-dark" href={`https://wa.me/${TUNGA_MOBILE_RAW}?text=${encodeURIComponent(whatsappMessage)}`} target="_blank" rel="noreferrer">Message us on WhatsApp now <Send size={16} strokeWidth={1.5} /></a>
+                <button className="button button-secondary" type="button" onClick={onClose}>Close</button>
+              </div>
             </div>
-            <div className="success-actions">
-              <div className="success-callout">Want a faster reply? Send your brief directly.</div>
-              <a className="button button-dark" href={`https://wa.me/${TUNGA_MOBILE_RAW}?text=${encodeURIComponent(whatsappMessage)}`} target="_blank" rel="noreferrer">Message us on WhatsApp now <Send size={16} strokeWidth={1.5} /></a>
-              <button className="button button-secondary" type="button" onClick={onClose}>Close</button>
-            </div>
-          </div>
+          </>
         ) : (
           <>
             <div className="quote-header">
-              <div className="quote-topline"><span>Project intake / Kigali</span><span>0{step} / 04</span></div>
-              {step === 1 ? (
-                <div className="quote-heading">
-                  <h2 id="quote-title">Let’s shape the <em>right brief.</em></h2>
-                  <p>A few details help us understand what your space needs before we speak.</p>
-                </div>
-              ) : (
-                <div className="quote-heading compact">
-                  <h2 id="quote-title">Request a quote</h2>
+              <div className="quote-heading quote-heading-row">
+                <h2 id="quote-title">{step === 1 ? <>Let’s shape the <em>right brief.</em></> : "Request a quote"}</h2>
+                <span className="quote-step-count">0{step} / 04</span>
+                <button className="quote-close quote-close-inline" type="button" onClick={onClose} aria-label="Close request a quote form"><X size={20} /></button>
+              </div>
+              {(draftRestored || draftStorageError) && (
+                <div className={`quote-draft-notice ${draftStorageError ? "has-error" : ""}`} role="status">
+                  <span>{draftStorageError ? "Your draft couldn't be saved on this device." : "Your saved draft has been restored."}</span>
+                  {draftRestored && <button type="button" onClick={startOver}>Start over</button>}
                 </div>
               )}
             </div>
