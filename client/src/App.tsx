@@ -849,7 +849,7 @@ function ServicesOverviewHero() {
 
 function Breadcrumbs({ items }: { items: { label: string; href?: string }[] }) {
   return (
-    <nav className="breadcrumbs" aria-label="Breadcrumb">
+    <nav className={`breadcrumbs ${items.some((item) => item.label === "Contact") ? "breadcrumbs-contact" : ""}`} aria-label="Breadcrumb">
       <ol>
         {items.map((item, index) => (
           <li key={`${item.label}-${index}`}>
@@ -1234,7 +1234,7 @@ function App() {
       "thank-you": "Thank you — Tunga Interiors",
     };
     const descriptions: Record<string, string> = {
-      home: "Tunga Interiors is a Kigali interior design and fit-out studio for homes, offices, and retail. Design and build by one team.",
+      home: "Interior design and fit-out in Kigali for homes, offices, shops, and hospitality spaces across Rwanda. Tunga Interiors takes projects from concept to handover.",
       services: "Explore Tunga Interiors' new projects, renovations, partitions, and finishes in Kigali.",
       projects: "Explore Tunga Interiors' interior design and fit-out work across homes, offices, and retail.",
       studio: "Meet James Manzi and Tunga Interiors, a Kigali interior design and fit-out studio.",
@@ -1277,7 +1277,7 @@ function App() {
   };
 
   return (
-    <main id="top">
+    <main id="top" className={activePage !== "contact" ? "has-floating-actions" : undefined}>
       <header className={`site-header ${menuOpen ? "menu-open" : ""}`}>
         <div className="header-inner">
           <Logo />
@@ -1595,7 +1595,7 @@ function App() {
 
       {!servicePage && (isHome || activePage === "contact") && <section className={`contact ${isHome ? "section-gold home-contact" : "section-dark contact-page"}`} id="contact">
         <div className="container contact-grid">
-          <div className="contact-heading reveal">
+          <div className={`contact-heading ${isHome ? "reveal" : ""}`}>
             {isHome ? (
               <>
                 <SectionLabel index="05" children="Start a project" />
@@ -1608,7 +1608,7 @@ function App() {
             ) : (
               <>
                 <span className="eyebrow contact-kicker">TUNGA INTERIORS / KIGALI</span>
-                <h1>Begin with the <em>space.</em></h1>
+                <h1>Begin with the <em>right conversation.</em></h1>
                 <p>Tell us what you’re planning, where the space is, and what you’d like it to become. We’ll shape the next step together.</p>
                 <ContactMap />
               </>
