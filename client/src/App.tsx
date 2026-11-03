@@ -849,7 +849,7 @@ function ServicesOverviewHero() {
 
 function Breadcrumbs({ items }: { items: { label: string; href?: string }[] }) {
   return (
-    <nav className="breadcrumbs" aria-label="Breadcrumb">
+    <nav className={`breadcrumbs ${items.some((item) => item.label === "Contact") ? "breadcrumbs-contact" : ""}`} aria-label="Breadcrumb">
       <ol>
         {items.map((item, index) => (
           <li key={`${item.label}-${index}`}>
@@ -1226,7 +1226,7 @@ function App() {
   }, [projectSlug]);
   useEffect(() => {
     const titles: Record<string, string> = {
-      home: "Tunga Interiors — Spaces with a point of view.",
+      home: "Interior Design & Fit-Out in Kigali, Rwanda | Tunga Interiors",
       services: "Tunga Interiors — Services",
       projects: "Tunga Interiors — Projects",
       studio: "Tunga Interiors — Studio",
@@ -1234,14 +1234,14 @@ function App() {
       "thank-you": "Thank you — Tunga Interiors",
     };
     const descriptions: Record<string, string> = {
-      home: "Tunga Interiors is a Kigali interior design and fit-out studio for homes, offices, and retail. Design and build by one team.",
+      home: "Interior design and fit-out in Kigali for homes, offices, shops, and hospitality spaces across Rwanda. Tunga Interiors takes projects from concept to handover.",
       services: "Explore Tunga Interiors' new projects, renovations, partitions, and finishes in Kigali.",
       projects: "Explore Tunga Interiors' interior design and fit-out work across homes, offices, and retail.",
       studio: "Meet James Manzi and Tunga Interiors, a Kigali interior design and fit-out studio.",
       contact: "Contact Tunga Interiors in Kigali about an interior project, renovation, or fit-out.",
       "thank-you": "Your Tunga Interiors enquiry is ready to continue in WhatsApp.",
     };
-    document.title = isNotFound
+    const title = isNotFound
       ? "Page Not Found — Tunga Interiors"
       : projectDetail
         ? `${projectDetail.title} — Projects | Tunga Interiors`
@@ -1252,11 +1252,23 @@ function App() {
           ? "Interior Renovation in Kigali | Tunga Interiors"
           : "Partitions & Finishes in Kigali | Tunga Interiors"
       : titles[activePage] || titles.home;
-    document.querySelector('meta[name="description"]')?.setAttribute("content", projectDetail?.description || servicePage?.intro || descriptions[activePage] || descriptions.home);
+    const description = projectDetail?.description || servicePage?.intro || descriptions[activePage] || descriptions.home;
+    const canonicalUrl = new URL(window.location.pathname, window.location.origin).href;
+    const shouldIndex = !isNotFound && !isThankYou;
+
+    document.title = title;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+    document.querySelector('meta[name="robots"]')?.setAttribute("content", shouldIndex ? "index, follow" : "noindex, follow");
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", canonicalUrl);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
+    document.querySelector('meta[property="og:url"]')?.setAttribute("content", canonicalUrl);
+    document.querySelector('meta[name="twitter:title"]')?.setAttribute("content", title);
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute("content", description);
     const heroImage = projectDetail?.heroImageUrl || projectDetail?.gallery[0] || projectDetail?.image;
     const ogImage = document.querySelector('meta[property="og:image"]');
     if (ogImage) ogImage.setAttribute("content", heroImage ? new URL(heroImage, window.location.origin).href : new URL("/og-image.png", window.location.origin).href);
-  }, [activePage, isNotFound, projectDetail, servicePage]);
+  }, [activePage, isNotFound, isThankYou, projectDetail, servicePage]);
 
   const closeMenu = () => setMenuOpen(false);
   const openQuote = (service = "", notes = "") => {
@@ -1277,7 +1289,7 @@ function App() {
   };
 
   return (
-    <main id="top">
+    <main id="top" className={activePage !== "contact" ? "has-floating-actions" : undefined}>
       <header className={`site-header ${menuOpen ? "menu-open" : ""}`}>
         <div className="header-inner">
           <Logo />
@@ -1595,7 +1607,7 @@ function App() {
 
       {!servicePage && (isHome || activePage === "contact") && <section className={`contact ${isHome ? "section-gold home-contact" : "section-dark contact-page"}`} id="contact">
         <div className="container contact-grid">
-          <div className="contact-heading reveal">
+          <div className={`contact-heading ${isHome ? "reveal" : ""}`}>
             {isHome ? (
               <>
                 <SectionLabel index="05" children="Start a project" />
@@ -1608,7 +1620,7 @@ function App() {
             ) : (
               <>
                 <span className="eyebrow contact-kicker">TUNGA INTERIORS / KIGALI</span>
-                <h1>Begin with the <em>space.</em></h1>
+                <h1>Begin with the <em>right conversation.</em></h1>
                 <p>Tell us what you’re planning, where the space is, and what you’d like it to become. We’ll shape the next step together.</p>
                 <ContactMap />
               </>
