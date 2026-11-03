@@ -1226,7 +1226,7 @@ function App() {
   }, [projectSlug]);
   useEffect(() => {
     const titles: Record<string, string> = {
-      home: "Tunga Interiors — Spaces with a point of view.",
+      home: "Interior Design & Fit-Out in Kigali, Rwanda | Tunga Interiors",
       services: "Tunga Interiors — Services",
       projects: "Tunga Interiors — Projects",
       studio: "Tunga Interiors — Studio",
@@ -1241,7 +1241,7 @@ function App() {
       contact: "Contact Tunga Interiors in Kigali about an interior project, renovation, or fit-out.",
       "thank-you": "Your Tunga Interiors enquiry is ready to continue in WhatsApp.",
     };
-    document.title = isNotFound
+    const title = isNotFound
       ? "Page Not Found — Tunga Interiors"
       : projectDetail
         ? `${projectDetail.title} — Projects | Tunga Interiors`
@@ -1252,11 +1252,23 @@ function App() {
           ? "Interior Renovation in Kigali | Tunga Interiors"
           : "Partitions & Finishes in Kigali | Tunga Interiors"
       : titles[activePage] || titles.home;
-    document.querySelector('meta[name="description"]')?.setAttribute("content", projectDetail?.description || servicePage?.intro || descriptions[activePage] || descriptions.home);
+    const description = projectDetail?.description || servicePage?.intro || descriptions[activePage] || descriptions.home;
+    const canonicalUrl = new URL(window.location.pathname, window.location.origin).href;
+    const shouldIndex = !isNotFound && !isThankYou;
+
+    document.title = title;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+    document.querySelector('meta[name="robots"]')?.setAttribute("content", shouldIndex ? "index, follow" : "noindex, follow");
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", canonicalUrl);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
+    document.querySelector('meta[property="og:url"]')?.setAttribute("content", canonicalUrl);
+    document.querySelector('meta[name="twitter:title"]')?.setAttribute("content", title);
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute("content", description);
     const heroImage = projectDetail?.heroImageUrl || projectDetail?.gallery[0] || projectDetail?.image;
     const ogImage = document.querySelector('meta[property="og:image"]');
     if (ogImage) ogImage.setAttribute("content", heroImage ? new URL(heroImage, window.location.origin).href : new URL("/og-image.png", window.location.origin).href);
-  }, [activePage, isNotFound, projectDetail, servicePage]);
+  }, [activePage, isNotFound, isThankYou, projectDetail, servicePage]);
 
   const closeMenu = () => setMenuOpen(false);
   const openQuote = (service = "", notes = "") => {
