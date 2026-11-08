@@ -17,7 +17,7 @@ import {
   Send,
   X,
 } from "lucide-react";
-import ProjectCoverflow from "./components/ProjectCoverflow";
+import ProjectMarquee from "./components/ProjectMarquee";
 
 const TUNGA_MOBILE = "+250 782 017 456";
 const TUNGA_MOBILE_RAW = "250782017456";
@@ -56,25 +56,29 @@ type Project = {
   heroImageWidth?: number;
   category: Exclude<ProjectCategory, "All">;
   image?: string;
+  imageAlt?: string;
+  imagePosition?: string;
   gallery: string[];
-  size: string;
+  galleryCaptions?: string[];
   spaceType: "House" | "Office" | "Hotel" | "Apartment";
   featured?: boolean;
 };
 
 const projectImage = (filename: string) => `/images/project/${encodeURIComponent(filename)}`;
-const projectPhotos: Omit<Project, "size" | "featured">[] = [
+const projectPhotos: Omit<Project, "featured">[] = [
   {
     slug: "open-plan-home",
     title: "An Open-Plan Home",
     description: "Kitchen, dining, and living share one generous room. Warm timber tones ground the space, while integrated cabinetry and layered lighting give each zone its own quiet definition.",
     category: "New projects",
     image: projectImage("project house-living room.webp"),
+    imageAlt: "Open-plan kitchen, dining and living room with warm timber floors.",
     gallery: [
       projectImage("project house-living room.webp"),
       projectImage("project house-living room 2.webp"),
       projectImage("project house detailed .webp"),
     ],
+    galleryCaptions: ["Kitchen, dining and living share one room.", "Warm timber floors and layered lighting.", "Decorative sideboard and dining area."],
     spaceType: "House",
   },
   {
@@ -83,11 +87,13 @@ const projectPhotos: Omit<Project, "size" | "featured">[] = [
     description: "A collection of bedroom and fitted-storage details, balancing soft upholstery and warm wood with clean-lined joinery. Each view focuses on choices that make a personal space feel more settled.",
     category: "Renovations",
     image: projectImage("project bedroom design.webp"),
+    imageAlt: "Bedroom with an upholstered bed, timber feature wall and soft lighting.",
     gallery: [
       projectImage("project bedroom design.webp"),
       projectImage("project bedroom.jpeg"),
       projectImage("project wordrobe.jpeg"),
     ],
+    galleryCaptions: ["Bedroom with a timber feature wall.", "Bedroom details in soft neutral finishes.", "Fitted wardrobes with open storage."],
     spaceType: "Apartment",
   },
   {
@@ -96,11 +102,14 @@ const projectPhotos: Omit<Project, "size" | "featured">[] = [
     description: "A working salon organized around a clear line of styling stations. Dark finishes and mirrored panels create a composed backdrop, while the photographs show both the fit-out and the finished space.",
     category: "Renovations",
     image: projectImage("project salon.jpeg"),
+    imageAlt: "Salon with a row of styling chairs, mirrors and dark finishes.",
+    imagePosition: "50% 58%",
     gallery: [
       projectImage("project salon.jpeg"),
       projectImage("project finishing walls.jpeg"),
       projectImage("WhatsApp Image 2026-10-07 at 11.42.50.jpeg"),
     ],
+    galleryCaptions: ["Salon styling stations and mirrored panels.", "A feature wall brings light to the interior.", "Salon workstations prepared for use."],
     spaceType: "Office",
   },
   {
@@ -109,11 +118,14 @@ const projectPhotos: Omit<Project, "size" | "featured">[] = [
     description: "Illuminated product niches, strong vertical framing, and a restrained dark palette put the fragrance displays at the center. Carefully placed light gives the room warmth and definition.",
     category: "New projects",
     image: projectImage("WhatsApp Image 2026-10-07 at 11.42.51.jpeg"),
+    imageAlt: "Fragrance boutique with illuminated product displays and dark finishes.",
+    imagePosition: "44% 50%",
     gallery: [
       projectImage("WhatsApp Image 2026-10-07 at 11.42.51.jpeg"),
       projectImage("WhatsApp Image 2026-10-07 at 11.42.50 (1).jpeg"),
       projectImage("project finishing1.jpeg"),
     ],
+    galleryCaptions: ["Fragrance displays set within a dark retail interior.", "Lit niches bring focus to the fragrance displays.", "Sculptural finishes frame the retail shelves."],
     spaceType: "Office",
   },
   {
@@ -122,11 +134,14 @@ const projectPhotos: Omit<Project, "size" | "featured">[] = [
     description: "Across these retail views, built-in shelving, feature walls, and integrated lighting give products a clear place to be seen. The display becomes part of the interior rather than an afterthought.",
     category: "Finishes",
     image: projectImage("project comercial.jpeg"),
+    imageAlt: "Retail display interior with built-in shelving and feature finishes.",
+    imagePosition: "46% 50%",
     gallery: [
       projectImage("project comercial.jpeg"),
       projectImage("project comercial .jpeg"),
       projectImage("WhatsApp Image 2026-10-07 at 11.42.44.jpeg"),
     ],
+    galleryCaptions: ["Retail shelves set into a feature wall.", "Shelving and feature finishes shape the display.", "Integrated lighting highlights the retail wall."],
     spaceType: "Office",
   },
   {
@@ -135,17 +150,18 @@ const projectPhotos: Omit<Project, "size" | "featured">[] = [
     description: "Tall stone-look surfaces and repeated timber battens bring scale and vertical rhythm to this commercial interior. A restrained palette lets material, proportion, and light do the work.",
     category: "Finishes",
     image: projectImage("project finishing.jpeg"),
+    imageAlt: "Commercial arrival with stone-look surfaces and vertical timber battens.",
     gallery: [
       projectImage("project finishing.jpeg"),
       projectImage("WhatsApp Image 2026-10-07 at 11.42.47.jpeg"),
     ],
+    galleryCaptions: ["Stone-look surfaces meet vertical timber battens.", "Timber battens add rhythm to the commercial interior."],
     spaceType: "Office",
   },
 ];
 
 const projects: Project[] = projectPhotos.map((project, index) => ({
   ...project,
-  size: `${String(index + 1).padStart(2, "0")} / ${projectPhotos.length}`,
   featured: index === 0,
 }));
 
@@ -174,11 +190,25 @@ function getProjectImageDimensions(src: string): [number, number] {
   return projectImageDimensions[filename] || [4, 3];
 }
 
-function getRelatedProjects(project: Project) {
-  const candidates = projects.filter((item) => item.slug !== project.slug);
-  const sameCategory = candidates.filter((item) => item.category === project.category);
-  const remaining = candidates.filter((item) => item.category !== project.category);
-  return [...sameCategory, ...remaining].slice(0, 2);
+function getRelatedProjects(project: Project): Project[] {
+  const otherProjects = projects.filter((item) => item.slug !== project.slug);
+  return [
+    ...otherProjects.filter((item) => item.category === project.category),
+    ...otherProjects.filter((item) => item.category !== project.category),
+  ].slice(0, 2);
+}
+
+function getProjectService(project: Project) {
+  if (project.category === "Renovations") return "Renovation";
+  if (project.category === "Finishes") return "Partitions & finishes";
+  return "New project";
+}
+
+function getMetaDescription(text: string, maxLength = 155) {
+  if (text.length <= maxLength) return text;
+  const shortened = text.slice(0, maxLength - 1);
+  const lastWordBoundary = shortened.lastIndexOf(" ");
+  return `${shortened.slice(0, lastWordBoundary > 0 ? lastWordBoundary : shortened.length).trimEnd()}...`;
 }
 
 type ProjectGalleryBlock =
@@ -375,62 +405,6 @@ const homeFaqItems = [
   { question: "What should I include in my first message?", answer: "Your space type, location, a short description of the work, and a rough timeline help start the conversation." },
 ];
 
-const studioGalleryItems = [
-  { src: images.newProject, alt: "Concept visual of a warm living and dining room with timber furniture and soft natural light", width: 17, ratio: "3 / 4", top: 13, position: "50% 50%" },
-  { src: "/images/project/project bedroom design.webp", alt: "Concept visual of a bedroom with warm wood, soft lighting, and a sculpted feature wall", width: 20, ratio: "4 / 5", top: 11, position: "50% 50%" },
-  { src: "/images/service/b30dfbb81188ce47a135f51253b18d16.jpg", alt: "Concept visual of a living room with a green sofa, timber feature wall, and layered lighting", width: 24, ratio: "2 / 3", top: 0, position: "35% 50%" },
-  { src: "/images/service/73411ad36820e4e197f9530ba7fae030.jpg", alt: "Concept visual of a warm neutral salon with mirrors, timber details, and styling chairs", width: 22, ratio: "2 / 3", top: 3, position: "50% 50%" },
-  { src: "/images/service/1000b5392e3dda6eba85feeb7db47b36.jpg", alt: "Concept visual of a softly lit boardroom with a long timber table and neutral finishes", width: 17, ratio: "3 / 4", top: 13, position: "50% 50%" },
-];
-
-function StudioStaggerGallery() {
-  const galleryRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const gallery = galleryRef.current;
-    if (!gallery || window.matchMedia("(prefers-reduced-motion: reduce), (pointer: coarse)").matches) return;
-
-    let frame = 0;
-    const updateParallax = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const viewportCenter = window.innerHeight / 2;
-        gallery.querySelectorAll<HTMLElement>(".studio-stagger-gallery-item").forEach((item, index) => {
-          const rect = item.getBoundingClientRect();
-          const distance = rect.top + rect.height / 2 - viewportCenter;
-          const drift = Math.max(-24, Math.min(24, distance * -0.035 * (0.55 + index * 0.12)));
-          item.style.setProperty("--parallax-y", `${drift}px`);
-        });
-      });
-    };
-
-    updateParallax();
-    window.addEventListener("scroll", updateParallax, { passive: true });
-    window.addEventListener("resize", updateParallax);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", updateParallax);
-      window.removeEventListener("resize", updateParallax);
-    };
-  }, []);
-
-  return (
-    <section className="studio-concepts" aria-label="Interior design concepts">
-      <div className="studio-stagger-gallery" ref={galleryRef}>
-        {studioGalleryItems.map((item) => (
-          <figure
-            className="studio-stagger-gallery-item image-reveal"
-            key={item.src}
-            style={{ flexGrow: item.width, aspectRatio: item.ratio, marginTop: `${item.top}%` }}
-          >
-            <img src={item.src} alt={item.alt} loading="lazy" decoding="async" sizes="(min-width: 1440px) 20vw, (min-width: 900px) 22vw, 62vw" style={{ objectPosition: item.position }} />
-          </figure>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function useReveal() {
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -496,13 +470,8 @@ function Logo({ size = "md" }: { size?: "md" | "lg" }) {
   );
 }
 
-function SectionLabel({ index, children }: { index: string; children: ReactNode }) {
-  return (
-    <div className="section-label">
-      <span className="section-index">{index}</span>
-      <span>{children}</span>
-    </div>
-  );
+function SectionLabel({ children }: { children: ReactNode }) {
+  return <div className="section-label">{children}</div>;
 }
 
 function ProjectCard({ project, label = project.category, servicePreview = false }: { project: Project; label?: string; servicePreview?: boolean }) {
@@ -522,7 +491,7 @@ function ProjectCard({ project, label = project.category, servicePreview = false
       >
         <div className={`project-image image-reveal ${project.image ? "" : "project-image-empty"}`}>
           {project.image ? (
-            <img src={project.image} alt={project.title} loading="lazy" decoding="async" />
+            <img src={project.image} alt={project.imageAlt || project.title} loading="lazy" decoding="async" />
           ) : (
             <div className="project-image-placeholder" role="img" aria-label={`${project.title} image placeholder`}>
               <span className="project-image-placeholder-mark"><Plus size={20} strokeWidth={1.2} /></span>
@@ -558,63 +527,86 @@ function ProjectDetail({ project, onQuote, scrollTo }: { project: Project; onQuo
   const fallbackHeroImage = project.gallery[0];
   const heroImage = project.heroImageUrl || fallbackHeroImage || project.image;
   const galleryImages = project.gallery.filter((image) => image !== heroImage);
-  const detailImage = galleryImages[0] || heroImage;
   const aboutText = project.aboutText || project.description;
   const relatedProjects = getRelatedProjects(project);
   const galleryBlocks = getProjectGalleryBlocks(galleryImages);
-  const whatsappMessage = `Hi Tunga, I’d like to ask about the ${project.title} project.`;
+  const whatsappMessage = `Hi Tunga, I'm interested in a project like '${project.title}'.`;
+  const enquiryNotes = `Project: ${project.title}\n${whatsappMessage}`;
+  const projectType = project.spaceType === "House" || project.spaceType === "Apartment"
+    ? "Residential"
+    : project.spaceType === "Hotel"
+      ? "Hospitality"
+      : "Commercial";
 
   return (
     <div className="project-detail">
-      {aboutText && (
-        <section className="project-detail-about" id="project-detail-about" aria-labelledby="project-detail-about-title">
-          {detailImage && (
-            <motion.img
-              className="project-detail-about-image"
-              src={detailImage}
-              alt=""
-              aria-hidden="true"
-              width={getProjectImageDimensions(detailImage)[0]}
-              height={getProjectImageDimensions(detailImage)[1]}
-              loading="lazy"
-              decoding="async"
-              initial={prefersReducedMotion ? false : { scale: 1.05 }}
-              whileInView={{ scale: 1 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: prefersReducedMotion ? 0 : 14, ease: "linear" }}
-            />
-          )}
-          <div className="project-detail-about-overlay" />
-          <motion.div
-            className="project-detail-about-copy"
-            initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: prefersReducedMotion ? 0 : 0.7 }}
+      <section className="project-detail-about" id="project-detail-about" aria-labelledby="project-detail-about-title">
+        {heroImage && (
+          <motion.img
+            className="project-detail-about-image"
+            src={heroImage}
+            alt={project.imageAlt || `${project.title} interior.`}
+            width={getProjectImageDimensions(heroImage)[0]}
+            height={getProjectImageDimensions(heroImage)[1]}
+            loading="eager"
+            decoding="async"
+            initial={prefersReducedMotion ? false : { scale: 1.05 }}
+            whileInView={{ scale: 1 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 14, ease: "linear" }}
+          />
+        )}
+        <div className="project-detail-about-overlay" />
+        <motion.div
+          className="project-detail-about-copy"
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.7 }}
+        >
+          <span className="project-detail-eyebrow">{projectType} · {project.category}</span>
+          <h1 id="project-detail-about-title">{project.title}</h1>
+          <button
+            className="button button-gold"
+            type="button"
+            onClick={() => onQuote(getProjectService(project), enquiryNotes)}
           >
-            <span className="project-detail-eyebrow">In more detail</span>
-            <h1 id="project-detail-about-title">About {project.title}</h1>
-            <p>{aboutText}</p>
-            <button
-              className="button button-gold"
-              type="button"
-              onClick={() => onQuote("New project", `Project: ${project.title}\n${whatsappMessage}`)}
-            >
-              Enquire about this project <ArrowUpRight size={16} />
-            </button>
-            <button type="button" className="project-detail-scroll" onClick={() => {
-              const gallery = document.getElementById("project-detail-gallery");
-              if (gallery) scrollTo(gallery);
-              else if (relatedProjects.length) {
-                const related = document.getElementById("related-projects");
-                if (related) scrollTo(related);
-              }
-            }}>
-              Scroll <ArrowDown size={15} aria-hidden="true" />
-            </button>
-          </motion.div>
-        </section>
-      )}
+            Enquire about this project <ArrowUpRight size={16} />
+          </button>
+          <button type="button" className="project-detail-scroll" onClick={() => {
+            const gallery = document.getElementById("project-detail-gallery");
+            if (gallery) scrollTo(gallery);
+            else if (relatedProjects.length > 0) {
+              const related = document.getElementById("related-projects");
+              if (related) scrollTo(related);
+            }
+          }}>
+            Scroll <ArrowDown size={15} aria-hidden="true" />
+          </button>
+        </motion.div>
+      </section>
+
+      <section className="project-detail-intro" aria-label={`${project.title} details`}>
+        <div className="project-detail-intro-inner">
+          <dl className="project-detail-facts">
+            <div>
+              <dt>Space</dt>
+              <dd>{project.spaceType}</dd>
+            </div>
+            <div>
+              <dt>Project type</dt>
+              <dd>{project.category}</dd>
+            </div>
+            {project.location && (
+              <div>
+                <dt>Location</dt>
+                <dd>{project.location}</dd>
+              </div>
+            )}
+          </dl>
+          <p>{aboutText}</p>
+        </div>
+      </section>
 
       {galleryBlocks.length > 0 && (
         <section className="project-detail-gallery" id="project-detail-gallery" aria-label={`${project.title} gallery`}>
@@ -632,7 +624,17 @@ function ProjectDetail({ project, onQuote, scrollTo }: { project: Project; onQuo
                       viewport={{ once: true, amount: 0.12 }}
                       transition={{ duration: prefersReducedMotion ? 0 : 0.65 }}
                     >
-                      <img src={item.src} alt={`${project.title} – image ${item.index + 1}`} width={width} height={height} loading="lazy" decoding="async" />
+                      <img
+                        src={item.src}
+                        alt={project.galleryCaptions?.[project.gallery.indexOf(item.src)] || `${project.title} interior detail.`}
+                        width={width}
+                        height={height}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      {project.galleryCaptions?.[project.gallery.indexOf(item.src)] && (
+                        <figcaption>{project.galleryCaptions[project.gallery.indexOf(item.src)]}</figcaption>
+                      )}
                     </motion.figure>
                   );
                 })}
@@ -646,21 +648,10 @@ function ProjectDetail({ project, onQuote, scrollTo }: { project: Project; onQuo
         <section className="project-detail-related" id="related-projects" aria-labelledby="related-projects-title">
           <div className="container">
             <h2 id="related-projects-title">Related projects</h2>
-            <div className="project-detail-related-grid">
-              {relatedProjects.map((related) => {
-                const image = related.heroImageUrl || related.gallery[0] || related.image;
-                const [width, height] = image ? getProjectImageDimensions(image) : [4, 3];
-                return (
-                  <a className="project-detail-related-card" key={related.slug} href={`/projects/${related.slug}`} aria-label={`View ${related.title}`}>
-                    {image && <img src={image} alt="" width={width} height={height} loading="lazy" decoding="async" />}
-                    <span className="project-detail-related-overlay" />
-                    <span className="project-detail-related-copy">
-                      {related.location && <span>{related.location}</span>}
-                      <strong>{related.title}</strong>
-                    </span>
-                  </a>
-                );
-              })}
+            <div className="project-grid">
+              {relatedProjects.map((relatedProject) => (
+                <ProjectCard key={relatedProject.slug} project={relatedProject} />
+              ))}
             </div>
           </div>
         </section>
@@ -690,17 +681,13 @@ function ContactInquiryForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const submitInquiry = trpc.contact.submitInquiry.useMutation();
   const spaceTypes = ["Home / apartment", "Office / workspace", "Retail / hospitality", "Other"] as const;
-  const budgetRanges = ["Under RWF 5M", "RWF 5M–20M", "RWF 20M–50M", "Above RWF 50M", "Not sure yet"] as const;
 
   const prepareMessage = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const name = String(formData.get("name") || "").trim();
     const phone = String(formData.get("phone") || "").trim();
-    const email = String(formData.get("email") || "").trim();
     const spaceType = String(formData.get("spaceType") || "") as typeof spaceTypes[number];
-    const location = String(formData.get("location") || "").trim();
-    const budgetRange = String(formData.get("budgetRange") || "") as typeof budgetRanges[number] | "";
     const brief = String(formData.get("brief") || "").trim();
     const consent = formData.get("consent") === "on";
     if (!consent) return;
@@ -711,17 +698,11 @@ function ContactInquiryForm() {
       await submitInquiry.mutateAsync({
         name,
         phone,
-        email,
         spaceType,
-        location,
-        budgetRange: budgetRange || undefined,
         brief,
         consent,
       });
-      const emailLine = email ? ` Email: ${email}.` : "";
-      const locationLine = location ? ` Location: ${location}.` : "";
-      const budgetLine = budgetRange ? ` Indicative budget: ${budgetRange}.` : "";
-        const message = `Hi Tunga, I’m ${name}. My phone is ${phone}.${emailLine} I’m planning a ${spaceType}.${locationLine}${budgetLine} ${brief}`;
+      const message = `Hi Tunga, I’m ${name}. My phone is ${phone}. I’m planning a ${spaceType}. ${brief}`;
       setWhatsappUrl(`https://wa.me/${TUNGA_MOBILE_RAW}?text=${encodeURIComponent(message)}`);
     } catch {
       setErrorMessage("We couldn’t save your enquiry. Please try again.");
@@ -730,37 +711,19 @@ function ContactInquiryForm() {
 
   return (
     <form className="contact-inquiry" onSubmit={prepareMessage} onChange={() => { setWhatsappUrl(""); setErrorMessage(""); }}>
-      <div className="contact-inquiry-heading">
-        <span className="detail-label">Start a project</span>
-        <p>A few details help us begin in the right place.</p>
-      </div>
       <label className="contact-form-field">
         <span>Your name</span>
         <input name="name" autoComplete="name" placeholder="Name" required />
       </label>
       <label className="contact-form-field">
+        <span>Your phone</span>
         <input name="phone" type="tel" autoComplete="tel" inputMode="tel" pattern="\\+?[0-9\\s().-]{7,24}" placeholder="+250 7XX XXX XXX" required />
-      </label>
-      <label className="contact-form-field">
-        <span>Email <small>Optional</small></span>
-        <input name="email" type="email" autoComplete="email" placeholder="you@example.com" />
       </label>
       <label className="contact-form-field">
         <span>Space type</span>
         <select name="spaceType" defaultValue="" required>
           <option value="" disabled>Select a space</option>
           {spaceTypes.map((spaceType) => <option key={spaceType}>{spaceType}</option>)}
-        </select>
-      </label>
-      <label className="contact-form-field">
-        <span>Location <small>Optional</small></span>
-        <input name="location" autoComplete="address-level2" placeholder="Neighbourhood or city" />
-      </label>
-      <label className="contact-form-field">
-        <span>Indicative budget <small>Optional</small></span>
-        <select name="budgetRange" defaultValue="">
-          <option value="">Select a range (optional)</option>
-          {budgetRanges.map((budgetRange) => <option key={budgetRange}>{budgetRange}</option>)}
         </select>
       </label>
       <label className="contact-form-field contact-form-brief">
@@ -829,7 +792,7 @@ function ContactMap() {
 }
 
 function PageIntro() {
-  const copy = ["04 / The studio", "A measured eye.", "A local point of view.", "Tunga Interiors is a Kigali interior design and fit-out studio led by James Manzi."];
+  const copy = ["The studio", "A measured eye.", "A local point of view.", "Tunga Interiors is a Kigali interior design and fit-out studio led by James Manzi."];
   return <section className="page-intro section-dark"><div className="container"><span className="eyebrow">{copy[0]}</span><h1 className="line-reveal"><HeadlineLine>{copy[1]}</HeadlineLine><HeadlineLine><em>{copy[2]}</em></HeadlineLine></h1><p>{copy[3]}</p></div></section>;
 }
 
@@ -839,7 +802,7 @@ function ServicesOverviewHero() {
       <img className="services-overview-hero-image" src="/images/service/faff789656d07ca42358f8928a3fe2f6.jpg" alt="" aria-hidden="true" fetchPriority="high" decoding="async" />
       <div className="services-overview-hero-overlay" aria-hidden="true" />
       <div className="services-overview-hero-copy">
-        <span className="eyebrow">02 / What we do</span>
+        <span className="eyebrow">What we do</span>
         <h1 id="services-overview-title">Spaces, shaped <em>with intent.</em></h1>
         <p>New projects, renovations, and interior finishes for homes and commercial spaces in Kigali.</p>
       </div>
@@ -847,9 +810,9 @@ function ServicesOverviewHero() {
   );
 }
 
-function Breadcrumbs({ items }: { items: { label: string; href?: string }[] }) {
+function Breadcrumbs({ items, isProject = false }: { items: { label: string; href?: string }[]; isProject?: boolean }) {
   return (
-    <nav className={`breadcrumbs ${items.some((item) => item.label === "Contact") ? "breadcrumbs-contact" : ""}`} aria-label="Breadcrumb">
+    <nav className={`breadcrumbs ${items.some((item) => item.label === "Contact") ? "breadcrumbs-contact" : ""} ${isProject ? "breadcrumbs-project" : ""}`} aria-label="Breadcrumb">
       <ol>
         {items.map((item, index) => (
           <li key={`${item.label}-${index}`}>
@@ -883,17 +846,14 @@ function ServicePage({ service, onQuote }: { service: ServiceDefinition; onQuote
             <p>{service.intro}</p>
           </div>
         </div>
-        <div className="service-page-index" aria-label={`Service ${service.slug === "new-projects" ? "one" : service.slug === "renovations" ? "two" : "three"} of three`}>
-          {service.slug === "new-projects" ? "01" : service.slug === "renovations" ? "02" : "03"}<span> / 03</span>
-        </div>
       </section>
-      <section className="service-included section-cream"><div className="container service-content-grid"><div><SectionLabel index="01" children="What’s included" /><h2>The right layers, <em>in place.</em></h2></div><div className="included-list">{service.included.map((item, index) => <div className="included-item" key={item}><span>0{index + 1}</span><p>{item}</p></div>)}</div></div></section>
-      <section className="service-steps section-dark"><div className="container service-content-grid"><div><SectionLabel index="02" children="How it works" /><h2>A clear way <em>through.</em></h2></div><div className="steps-list">{service.steps.map((step, index) => <div className="step-item" key={step}><span>0{index + 1}</span><p>{step}</p></div>)}</div></div></section>
+      <section className="service-included section-cream"><div className="container service-content-grid"><div><SectionLabel>What’s included</SectionLabel><h2>The right layers, <em>in place.</em></h2></div><ul className="included-list" role="list">{service.included.map((item) => <li className="included-item" key={item}><p>{item}</p></li>)}</ul></div></section>
+      <section className="service-steps section-dark"><div className="container service-content-grid"><div><SectionLabel>How it works</SectionLabel><h2>A clear way <em>through.</em></h2></div><ol className="steps-list" role="list">{service.steps.map((step) => <li className="step-item" key={step}><p>{step}</p></li>)}</ol></div></section>
       <section className="service-visual-inspiration section-dark" aria-labelledby="service-visuals-title">
         <div className="container">
           <div className="service-visuals-heading">
             <div>
-              <SectionLabel index="03" children="Design references" />
+              <SectionLabel>Design references</SectionLabel>
               <h2 id="service-visuals-title" className="line-reveal"><HeadlineLine>Ideas for</HeadlineLine><HeadlineLine><em>considered spaces.</em></HeadlineLine></h2>
             </div>
             <p>Illustrative interior concepts for material, lighting, and layout inspiration. These are references, not photographs of Tunga completed projects.</p>
@@ -907,13 +867,13 @@ function ServicePage({ service, onQuote }: { service: ServiceDefinition; onQuote
           </div>
         </div>
       </section>
-      <section className="contact section-gold service-closing"><div className="container contact-grid"><div className="contact-heading"><SectionLabel index="04" children="Start a conversation" /><h2>Tell us what you’re <em>building.</em></h2><p>Share a little about your {service.navLabel.toLowerCase()} project and where you are in the process.</p><button className="button button-dark" type="button" onClick={() => onQuote(service.navLabel)}>Request a quote <MessageCircle size={17} /></button></div><div className="service-whatsapp-card"><span className="detail-label">Ready message</span><p>{service.quoteMessage}</p><a className="button button-dark" href={whatsappUrl} target="_blank" rel="noreferrer">Open WhatsApp <ArrowUpRight size={16} /></a></div></div></section>
+      <section className="contact section-gold service-closing"><div className="container contact-grid"><div className="contact-heading"><SectionLabel>Start a conversation</SectionLabel><h2>Tell us what you’re <em>building.</em></h2><p>Share a little about your {service.navLabel.toLowerCase()} project and where you are in the process.</p><button className="button button-dark" type="button" onClick={() => onQuote(service.navLabel)}>Request a quote <MessageCircle size={17} /></button></div><div className="service-whatsapp-card"><span className="detail-label">Ready message</span><p>{service.quoteMessage}</p><a className="button button-dark" href={whatsappUrl} target="_blank" rel="noreferrer">Open WhatsApp <ArrowUpRight size={16} /></a></div></div></section>
     </>
   );
 }
 
 function ThankYouPage() {
-  return <section className="thank-you-page section-gold"><div className="container thank-you-inner"><SectionLabel index="06" children="WhatsApp handoff ready" /><h1>Your next conversation <em>starts here.</em></h1><p>WhatsApp should now be open with your Tunga Interiors message. Send it when you’re ready and James will take the conversation from there.</p><div className="thank-you-actions"><a className="button button-dark" href="/projects">Explore our projects <ArrowUpRight size={16} /></a><a className="text-link" href="/">Back to home <ArrowDownRight size={17} /></a></div><div className="thank-you-contact"><span className="detail-label">Need us directly?</span><a href={`tel:+${TUNGA_MOBILE_RAW}`}>{TUNGA_MOBILE}</a><a href={`mailto:${TUNGA_EMAIL}`}>{TUNGA_EMAIL}</a></div></div></section>;
+  return <section className="thank-you-page section-gold"><div className="container thank-you-inner"><SectionLabel>WhatsApp handoff ready</SectionLabel><h1>Your next conversation <em>starts here.</em></h1><p>WhatsApp should now be open with your Tunga Interiors message. Send it when you’re ready and James will take the conversation from there.</p><div className="thank-you-actions"><a className="button button-dark" href="/projects">Explore our projects <ArrowUpRight size={16} /></a><a className="text-link" href="/">Back to home <ArrowDownRight size={17} /></a></div><div className="thank-you-contact"><span className="detail-label">Need us directly?</span><a href={`tel:+${TUNGA_MOBILE_RAW}`}>{TUNGA_MOBILE}</a><a href={`mailto:${TUNGA_EMAIL}`}>{TUNGA_EMAIL}</a></div></div></section>;
 }
 
 function QuoteSelectField({ label, value, options, placeholder, onChange }: { label: string; value: string; options: string[]; placeholder: string; onChange: (value: string) => void }) {
@@ -1046,11 +1006,11 @@ function QuoteModal({ open, onClose, initialService = "", initialNotes = "" }: {
               <span className="eyebrow">Brief received</span>
               <h2>Thanks, {firstName}.</h2>
               <p className="success-body">We’ll message you on WhatsApp within 24 hours.</p>
-              <div className="success-steps" aria-label="What happens next">
-                <div><span>1</span><p>We review your brief.</p></div>
-                <div><span>2</span><p>We reach out to agree a site visit.</p></div>
-                <div><span>3</span><p>You get a concept and a clear budget.</p></div>
-              </div>
+              <ol className="success-steps" role="list" aria-label="What happens next">
+                <li><span className="success-step-mark" aria-hidden="true" /><p>We review your brief.</p></li>
+                <li><span className="success-step-mark" aria-hidden="true" /><p>We reach out to agree a site visit.</p></li>
+                <li><span className="success-step-mark" aria-hidden="true" /><p>You get a concept and a clear budget.</p></li>
+              </ol>
               <div className="success-actions">
                 <div className="success-callout">Want a faster reply? Send your brief directly.</div>
                 <a className="button button-dark" href={`https://wa.me/${TUNGA_MOBILE_RAW}?text=${encodeURIComponent(whatsappMessage)}`} target="_blank" rel="noreferrer">Message us on WhatsApp now <Send size={16} strokeWidth={1.5} /></a>
@@ -1063,7 +1023,7 @@ function QuoteModal({ open, onClose, initialService = "", initialNotes = "" }: {
             <div className="quote-header">
               <div className="quote-heading quote-heading-row">
                 <h2 id="quote-title">{step === 1 ? <>Let’s shape the <em>right brief.</em></> : "Request a quote"}</h2>
-                <span className="quote-step-count">0{step} / 04</span>
+                <span className="sr-only" aria-live="polite">Step {step} of 4</span>
                 <button className="quote-close quote-close-inline" type="button" onClick={onClose} aria-label="Close request a quote form"><X size={20} /></button>
               </div>
               {(draftRestored || draftStorageError) && (
@@ -1073,7 +1033,7 @@ function QuoteModal({ open, onClose, initialService = "", initialNotes = "" }: {
                 </div>
               )}
             </div>
-            <div className="quote-progress" aria-label={`Step ${step} of 4`}>
+            <div className="quote-progress" role="group" aria-label="Request steps">
               {quoteSteps.map((label, index) => {
                 const isCompleted = index + 1 < step;
                 const isActive = index + 1 === step;
@@ -1085,8 +1045,9 @@ function QuoteModal({ open, onClose, initialService = "", initialNotes = "" }: {
                     onClick={() => isCompleted && setStep(index + 1)}
                     disabled={!isCompleted}
                     aria-label={`Go to ${label}`}
+                    aria-current={isActive ? "step" : undefined}
                   >
-                    <span>{isCompleted ? <CheckCircle2 size={14} strokeWidth={2} /> : `0${index + 1}`}</span>
+                    <span aria-hidden="true">{isCompleted && <CheckCircle2 size={14} strokeWidth={2} />}</span>
                     {label}
                   </button>
                 );
@@ -1252,7 +1213,9 @@ function App() {
           ? "Interior Renovation in Kigali | Tunga Interiors"
           : "Partitions & Finishes in Kigali | Tunga Interiors"
       : titles[activePage] || titles.home;
-    const description = projectDetail?.description || servicePage?.intro || descriptions[activePage] || descriptions.home;
+    const description = projectDetail
+      ? getMetaDescription(projectDetail.description)
+      : servicePage?.intro || descriptions[activePage] || descriptions.home;
     const canonicalUrl = new URL(window.location.pathname, window.location.origin).href;
     const shouldIndex = !isNotFound && !isThankYou;
 
@@ -1325,10 +1288,10 @@ function App() {
           </button>
         </div>
         <div className="mobile-menu" aria-hidden={!menuOpen}>
-          {navItems.map((item, index) => item.label === "Services" ? (
+          {navItems.map((item) => item.label === "Services" ? (
             <div className="mobile-service-menu" key={item.href}>
               <button className={`mobile-service-toggle ${isNavActive(item.href) ? "active" : ""}`} type="button" onClick={() => setServiceMenuOpen((open) => !open)} aria-expanded={serviceMenuOpen} aria-current={isNavActive(item.href) ? "page" : undefined}>
-                <span>0{index + 1}</span>{item.label}<Plus className={serviceMenuOpen ? "rotated" : ""} size={18} strokeWidth={1.5} />
+                {item.label}<Plus className={serviceMenuOpen ? "rotated" : ""} size={18} strokeWidth={1.5} />
               </button>
               {serviceMenuOpen && (
                 <div className="mobile-service-links">
@@ -1343,7 +1306,7 @@ function App() {
             </div>
           ) : (
             <a className={isNavActive(item.href) ? "active" : ""} key={item.href} href={item.href} onClick={closeMenu} aria-current={isNavActive(item.href) ? "page" : undefined}>
-              <span>0{index + 1}</span>{item.label}<ArrowUpRight size={17} strokeWidth={1.5} />
+              {item.label}<ArrowUpRight size={17} strokeWidth={1.5} />
             </a>
           ))}
           {activePage !== "contact" && <button className="mobile-menu-cta" type="button" onClick={() => openQuote()}>
@@ -1352,7 +1315,7 @@ function App() {
         </div>
       </header>
 
-      {!isHome && !isNotFound && !isThankYou && breadcrumbItems.length > 0 && <Breadcrumbs items={breadcrumbItems} />}
+      {!isHome && !isNotFound && !isThankYou && breadcrumbItems.length > 0 && <Breadcrumbs items={breadcrumbItems} isProject={!!projectDetail} />}
       {isNotFound && <NotFoundPage />}
       {!isNotFound && projectDetail && <ProjectDetail project={projectDetail} onQuote={openQuote} scrollTo={scrollTo} />}
       {!isNotFound && servicePage && <ServicePage service={servicePage} onQuote={openQuote} />}
@@ -1369,9 +1332,6 @@ function App() {
               <HeadlineLine>Spaces with</HeadlineLine>
               <HeadlineLine><em>a point of view.</em></HeadlineLine>
             </h1>
-            <p className="hero-description">
-              Interior design and fit-out in Kigali. One team takes your space from first sketch to handover.
-            </p>
             <div className="hero-actions">
               <button className="button button-gold" type="button" onClick={() => openQuote()}>
                 Start a project <ArrowUpRight size={16} strokeWidth={1.6} />
@@ -1384,14 +1344,10 @@ function App() {
         </div>
       </section>}
 
-      {!servicePage && (isHome || activePage === "studio") && <section className="intro section-dark" id="intro">
+      {!servicePage && isHome && <section className="intro section-dark" id="intro">
         <div className="container intro-grid">
-          <div className="intro-marker reveal">
-            <span className="gold-square" />
-            <span>01 / 05</span>
-          </div>
           <div className="intro-copy reveal reveal-delay-1">
-            <SectionLabel index="01" children="The Tunga approach" />
+            <SectionLabel>The Tunga approach</SectionLabel>
             <h2 className="line-reveal">
               <HeadlineLine>One studio.</HeadlineLine><HeadlineLine><em>Design through delivery.</em></HeadlineLine>
             </h2>
@@ -1408,7 +1364,7 @@ function App() {
       {!isNotFound && !servicePage && (isHome || activePage === "services") && <section className="services section-cream" id="services">
         <div className="container">
           <div className={`section-heading reveal${activePage === "services" ? "" : " section-heading--home"}`}>
-            <SectionLabel index="02" children={activePage === "services" ? "Choose a service" : "What we do"} />
+            <SectionLabel>{activePage === "services" ? "Choose a service" : "What we do"}</SectionLabel>
             {activePage === "services" ? (
               <>
                 <h2 className="line-reveal"><HeadlineLine>A clear place</HeadlineLine><HeadlineLine><em>to start.</em></HeadlineLine></h2>
@@ -1418,7 +1374,6 @@ function App() {
           </div>
           <div className="services-list">
             <article className="service-card reveal" onClick={() => { window.location.href = "/services/new-projects"; }} role="link" tabIndex={0}>
-              <div className="service-number">01</div>
               <div className="service-visual image-reveal">
                 <img src={images.newProject} alt="Warm living and dining interior" loading="lazy" decoding="async" />
                 <span className="image-corner corner-top" />
@@ -1433,7 +1388,6 @@ function App() {
               </div>
             </article>
             <article className="service-card reveal reveal-delay-1" onClick={() => { window.location.href = "/services/renovations"; }} role="link" tabIndex={0}>
-              <div className="service-number">02</div>
               <div className="service-visual">
                 <img src={images.renovation} alt="Contemporary salon interior with styling stations" loading="lazy" decoding="async" />
                 <span className="image-corner corner-top" />
@@ -1448,7 +1402,6 @@ function App() {
               </div>
             </article>
             <article className="service-card reveal reveal-delay-2" onClick={() => { window.location.href = "/services/partitions-finishes"; }} role="link" tabIndex={0}>
-              <div className="service-number">03</div>
               <div className="service-visual">
                 <img src={images.partitions} alt="Glass-framed office meeting room partition" loading="lazy" decoding="async" />
                 <span className="image-corner corner-top" />
@@ -1472,15 +1425,15 @@ function App() {
             <span className="eyebrow">FROM BRIEF TO HANDOVER</span>
             <h2 className="line-reveal"><HeadlineLine>How a project</HeadlineLine><HeadlineLine><em>runs.</em></HeadlineLine></h2>
           </div>
-          <div className="home-process-grid">
-            {homeProcessSteps.map((step, index) => (
-              <article className="home-process-step reveal" key={step.title}>
-                <span className="home-process-number">0{index + 1}</span>
+          <ol className="home-process-grid" role="list">
+            {homeProcessSteps.map((step) => (
+              <li className="home-process-step reveal" key={step.title}>
+                <span className="home-process-mark" aria-hidden="true" />
                 <h3>{step.title}</h3>
                 <p>{step.copy}</p>
-              </article>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>}
 
@@ -1527,10 +1480,9 @@ function App() {
                     </button>
                   ))}
                 </div>
-                <span className="project-count">{visibleHomeProjects.length} / {projects.length} projects</span>
               </div>
               {visibleHomeProjects.length ? (
-                <ProjectCoverflow key={portfolioFilter} projects={visibleHomeProjects} />
+                <ProjectMarquee key={portfolioFilter} projects={visibleHomeProjects} />
               ) : (
                 <p className="portfolio-empty">Hospitality projects are not yet featured in the gallery.</p>
               )}
@@ -1551,7 +1503,19 @@ function App() {
         </div>
       </section>}
 
-      {!servicePage && (isHome || activePage === "studio") && <section className="studio section-cream" id="studio">
+      {!servicePage && isHome && <section className="home-proof" aria-label="About Tunga Interiors">
+        <div className="container home-proof-inner">
+          <p className="home-proof-copy">
+            <strong>Founded by James Manzi in Kigali.</strong>
+            <span>One team from design through delivery.</span>
+          </p>
+          <a className="home-proof-link" href="/studio">
+            Meet the studio <ArrowUpRight size={16} strokeWidth={1.5} />
+          </a>
+        </div>
+      </section>}
+
+      {!servicePage && activePage === "studio" && <section className="studio section-cream" id="studio">
         <div className="container studio-grid">
           <div className="studio-heading reveal">
             <span className="eyebrow studio-kicker">THE STUDIO</span>
@@ -1586,8 +1550,6 @@ function App() {
         )}
       </section>}
 
-      {!servicePage && isHome && <StudioStaggerGallery />}
-
       {!servicePage && isHome && <section className="home-faq section-dark">
         <div className="container home-faq-grid">
           <div className="home-faq-heading">
@@ -1610,7 +1572,7 @@ function App() {
           <div className={`contact-heading ${isHome ? "reveal" : ""}`}>
             {isHome ? (
               <>
-                <SectionLabel index="05" children="Start a project" />
+                <SectionLabel>Start a project</SectionLabel>
                 <h2 className="line-reveal"><HeadlineLine>Tell us what you’re</HeadlineLine><HeadlineLine><em>building.</em></HeadlineLine></h2>
                 <p>Send a few details about your space and we’ll reply with next steps.</p>
                 <a className="button button-dark" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
@@ -1619,9 +1581,7 @@ function App() {
               </>
             ) : (
               <>
-                <span className="eyebrow contact-kicker">TUNGA INTERIORS / KIGALI</span>
                 <h1>Begin with the <em>right conversation.</em></h1>
-                <p>Tell us what you’re planning, where the space is, and what you’d like it to become. We’ll shape the next step together.</p>
                 <ContactMap />
               </>
             )}
@@ -1674,10 +1634,6 @@ function App() {
       </footer>
 
       {activePage !== "contact" && <div className="floating-actions">
-        <button className="floating-project" type="button" onClick={() => openQuote()} aria-label="Start a project">
-          <span>Start a project</span>
-          <ArrowUpRight size={17} strokeWidth={1.6} />
-        </button>
         <a className="floating-whatsapp" href={WHATSAPP_URL} target="_blank" rel="noreferrer" aria-label="Chat with Tunga Interiors on WhatsApp">
           <MessageCircle size={20} strokeWidth={1.7} />
           <span>WhatsApp us</span>
