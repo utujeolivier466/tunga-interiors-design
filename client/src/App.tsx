@@ -1171,6 +1171,12 @@ function App() {
   const serviceSlug = activePage === "services" ? routeSegments[1] as ServiceSlug | undefined : undefined;
   const servicePage = serviceSlug ? serviceDefinitions[serviceSlug] : undefined;
   const projectDetail = projectSlug ? projects.find((project) => project.slug === projectSlug) : undefined;
+  const floatingWhatsappMessage = projectDetail
+    ? `Hi Tunga, I’m interested in a project like “${projectDetail.title}”.`
+    : servicePage
+      ? `Hi Tunga, I’m asking about ${servicePage.navLabel}.`
+      : "Hi Tunga, I'd like to start a project. Space type: / Location: / Rough timeline:";
+  const floatingWhatsappUrl = `https://wa.me/${TUNGA_MOBILE_RAW}?text=${encodeURIComponent(floatingWhatsappMessage)}`;
   const isHome = activePage === "home";
   const isThankYou = activePage === "thank-you";
   const isNotFound =
@@ -1690,7 +1696,7 @@ function App() {
           <Phone size={18} strokeWidth={1.8} />
           <span>Call</span>
         </a>
-        <a className="floating-whatsapp" href={WHATSAPP_URL} target="_blank" rel="noreferrer" aria-label="Chat with Tunga Interiors on WhatsApp">
+        <a className="floating-whatsapp" href={floatingWhatsappUrl} target="_blank" rel="noreferrer" aria-label="Chat with Tunga Interiors on WhatsApp">
           <MessageCircle size={20} strokeWidth={1.7} />
           <span>WhatsApp</span>
         </a>
