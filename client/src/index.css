@@ -358,10 +358,12 @@ h1 em, h2 em { color: var(--gold-light); font-style: italic; }
 .socials svg .social-icon-fill { fill: currentColor; stroke: none; }
 .footer-back { display: inline-flex; align-items: center; justify-self: end; gap: 8px; color: var(--gold-light); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
 .footer-bottom { display: flex; justify-content: space-between; gap: 20px; padding: 19px 180px 0 0; border-top: 1px solid var(--line-dark); color: rgba(241, 237, 229, 0.35); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; }
-.floating-actions { position: fixed; z-index: 30; right: 24px; bottom: 23px; display: flex; }
-.floating-whatsapp { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 46px; padding: 0 17px; border: 1px solid rgba(200, 164, 106, 0.76); border-radius: 999px; font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; box-shadow: 0 9px 28px rgba(0, 0, 0, 0.22); backdrop-filter: blur(12px); transition: background 220ms ease, color 220ms ease, transform 220ms var(--ease); }
-.floating-whatsapp { background: rgba(9, 9, 9, 0.92); color: var(--gold-light); }
-.floating-whatsapp:hover { background: var(--gold); color: var(--ink); transform: translateY(-3px); }
+.has-floating-actions { padding-bottom: 92px; }
+.floating-actions { position: fixed; z-index: 30; right: 50%; bottom: 20px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; width: min(520px, calc(100vw - 40px)); padding: 7px; border: 1px solid rgba(201, 162, 99, 0.34); border-radius: 999px; background: rgba(9, 9, 9, 0.88); box-shadow: 0 10px 32px rgba(0, 0, 0, 0.3); transform: translateX(50%); backdrop-filter: blur(16px); }
+.floating-call, .floating-whatsapp { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-width: 0; min-height: 48px; padding: 0 17px; border: 1px solid transparent; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; transition: background 220ms ease, color 220ms ease, transform 220ms var(--ease); }
+.floating-call { background: transparent; color: var(--bone); }
+.floating-whatsapp { border-color: var(--gold); background: var(--gold); color: var(--ink); }
+.floating-call:hover, .floating-whatsapp:hover { background: var(--gold); color: var(--ink); transform: translateY(-3px); }
 .project-index-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 34px 18px; padding-top: 40px; }
 .project-index-grid .project-card, .project-index-grid .project-featured { grid-column: auto; }
 .project-index-grid .project-image { aspect-ratio: 4 / 6; }
@@ -578,9 +580,10 @@ h1 em, h2 em { color: var(--gold-light); font-style: italic; }
   .site-footer { padding-top: 38px; }
   .footer-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 15px; line-height: 1.5; }
   .footer-bottom span:last-child { grid-column: 1 / -1; }
-  .has-floating-actions { padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
-  .floating-actions { right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); left: auto; }
-  .floating-whatsapp { min-height: 48px; }
+  .has-floating-actions { padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
+  .floating-actions { right: 50%; bottom: max(12px, env(safe-area-inset-bottom)); width: calc(100vw - 32px); gap: 5px; padding: 6px; transform: translateX(50%); }
+  .floating-call, .floating-whatsapp { min-height: 46px; gap: 7px; padding: 0 8px; font-size: 9px; letter-spacing: 0.08em; }
+  .floating-call svg, .floating-whatsapp svg { width: 17px; height: 17px; flex: 0 0 auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {

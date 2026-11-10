@@ -13,6 +13,7 @@ import {
   Menu,
   MessageCircle,
   MoveUpRight,
+  Phone,
   Plus,
   Send,
   X,
@@ -1306,7 +1307,7 @@ function App() {
   };
 
   return (
-    <main id="top" className={activePage !== "contact" ? "has-floating-actions" : undefined}>
+    <main id="top" className="has-floating-actions">
       <header className={`site-header ${menuOpen ? "menu-open" : ""}`}>
         <div className="header-inner">
           <Logo />
@@ -1684,12 +1685,16 @@ function App() {
         </div>
       </footer>
 
-      {activePage !== "contact" && <div className="floating-actions">
+      <div className="floating-actions" role="group" aria-label="Contact Tunga Interiors">
+        <a className="floating-call" href={`tel:+${TUNGA_MOBILE_RAW}`} aria-label={`Call Tunga Interiors at ${TUNGA_MOBILE}`}>
+          <Phone size={18} strokeWidth={1.8} />
+          <span>Call</span>
+        </a>
         <a className="floating-whatsapp" href={WHATSAPP_URL} target="_blank" rel="noreferrer" aria-label="Chat with Tunga Interiors on WhatsApp">
           <MessageCircle size={20} strokeWidth={1.7} />
-          <span>WhatsApp us</span>
+          <span>WhatsApp</span>
         </a>
-      </div>}
+      </div>
       <QuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} initialService={quoteService} initialNotes={quoteNotes} />
     </main>
   );
