@@ -13,6 +13,7 @@ import {
   Menu,
   MessageCircle,
   MoveUpRight,
+  Phone,
   Plus,
   Send,
   X,
@@ -405,6 +406,62 @@ const homeFaqItems = [
   { question: "What should I include in my first message?", answer: "Your space type, location, a short description of the work, and a rough timeline help start the conversation." },
 ];
 
+const studioGalleryItems = [
+  { src: images.newProject, alt: "Warm living and dining room with timber furniture and soft natural light", width: 17, ratio: "3 / 4", top: 13, position: "50% 50%" },
+  { src: "/images/project/project bedroom design.webp", alt: "Bedroom with warm wood, soft lighting, and a sculpted feature wall", width: 20, ratio: "4 / 5", top: 11, position: "50% 50%" },
+  { src: "/images/service/b30dfbb81188ce47a135f51253b18d16.jpg", alt: "Living room with a green sofa, timber feature wall, and layered lighting", width: 24, ratio: "2 / 3", top: 0, position: "35% 50%" },
+  { src: "/images/service/73411ad36820e4e197f9530ba7fae030.jpg", alt: "Warm neutral salon with mirrors, timber details, and styling chairs", width: 22, ratio: "2 / 3", top: 3, position: "50% 50%" },
+  { src: "/images/service/1000b5392e3dda6eba85feeb7db47b36.jpg", alt: "Softly lit boardroom with a long timber table and neutral finishes", width: 17, ratio: "3 / 4", top: 13, position: "50% 50%" },
+];
+
+function StudioStaggerGallery() {
+  const galleryRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const gallery = galleryRef.current;
+    if (!gallery || window.matchMedia("(prefers-reduced-motion: reduce), (pointer: coarse)").matches) return;
+
+    let frame = 0;
+    const updateParallax = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const viewportCenter = window.innerHeight / 2;
+        gallery.querySelectorAll<HTMLElement>(".studio-stagger-gallery-item").forEach((item, index) => {
+          const rect = item.getBoundingClientRect();
+          const distance = rect.top + rect.height / 2 - viewportCenter;
+          const drift = Math.max(-24, Math.min(24, distance * -0.035 * (0.55 + index * 0.12)));
+          item.style.setProperty("--parallax-y", `${drift}px`);
+        });
+      });
+    };
+
+    updateParallax();
+    window.addEventListener("scroll", updateParallax, { passive: true });
+    window.addEventListener("resize", updateParallax);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", updateParallax);
+      window.removeEventListener("resize", updateParallax);
+    };
+  }, []);
+
+  return (
+    <section className="studio-concepts" aria-label="Interior design concepts">
+      <div className="studio-stagger-gallery" ref={galleryRef}>
+        {studioGalleryItems.map((item) => (
+          <figure
+            className="studio-stagger-gallery-item image-reveal"
+            key={item.src}
+            style={{ flexGrow: item.width, aspectRatio: item.ratio, marginTop: `${item.top}%` }}
+          >
+            <img src={item.src} alt={item.alt} loading="lazy" decoding="async" sizes="(min-width: 1440px) 20vw, (min-width: 900px) 22vw, 62vw" style={{ objectPosition: item.position }} />
+          </figure>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function useReveal() {
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -664,7 +721,6 @@ function NotFoundPage() {
   return (
     <section className="page-intro section-dark">
       <div className="container">
-        <span className="eyebrow">Tunga Interiors</span>
         <h1>Page not found.</h1>
         <p>This page may have moved or no longer be available.</p>
         <div className="not-found-actions">
@@ -792,8 +848,8 @@ function ContactMap() {
 }
 
 function PageIntro() {
-  const copy = ["The studio", "A measured eye.", "A local point of view.", "Tunga Interiors is a Kigali interior design and fit-out studio led by James Manzi."];
-  return <section className="page-intro section-dark"><div className="container"><span className="eyebrow">{copy[0]}</span><h1 className="line-reveal"><HeadlineLine>{copy[1]}</HeadlineLine><HeadlineLine><em>{copy[2]}</em></HeadlineLine></h1><p>{copy[3]}</p></div></section>;
+  const copy = ["A measured eye.", "A local point of view.", "Tunga Interiors is a Kigali interior design and fit-out studio led by James Manzi."];
+  return <section className="page-intro section-dark"><div className="container"><h1 className="line-reveal"><HeadlineLine>{copy[0]}</HeadlineLine><HeadlineLine><em>{copy[1]}</em></HeadlineLine></h1><p>{copy[2]}</p></div></section>;
 }
 
 function ServicesOverviewHero() {
@@ -802,7 +858,6 @@ function ServicesOverviewHero() {
       <img className="services-overview-hero-image" src="/images/service/faff789656d07ca42358f8928a3fe2f6.jpg" alt="" aria-hidden="true" fetchPriority="high" decoding="async" />
       <div className="services-overview-hero-overlay" aria-hidden="true" />
       <div className="services-overview-hero-copy">
-        <span className="eyebrow">What we do</span>
         <h1 id="services-overview-title">Spaces, shaped <em>with intent.</em></h1>
         <p>New projects, renovations, and interior finishes for homes and commercial spaces in Kigali.</p>
       </div>
@@ -1116,6 +1171,12 @@ function App() {
   const serviceSlug = activePage === "services" ? routeSegments[1] as ServiceSlug | undefined : undefined;
   const servicePage = serviceSlug ? serviceDefinitions[serviceSlug] : undefined;
   const projectDetail = projectSlug ? projects.find((project) => project.slug === projectSlug) : undefined;
+  const floatingWhatsappMessage = projectDetail
+    ? `Hi Tunga, I’m interested in a project like “${projectDetail.title}”.`
+    : servicePage
+      ? `Hi Tunga, I’m asking about ${servicePage.navLabel}.`
+      : "Hi Tunga, I'd like to start a project. Space type: / Location: / Rough timeline:";
+  const floatingWhatsappUrl = `https://wa.me/${TUNGA_MOBILE_RAW}?text=${encodeURIComponent(floatingWhatsappMessage)}`;
   const isHome = activePage === "home";
   const isThankYou = activePage === "thank-you";
   const isNotFound =
@@ -1252,7 +1313,7 @@ function App() {
   };
 
   return (
-    <main id="top" className={activePage !== "contact" ? "has-floating-actions" : undefined}>
+    <main id="top" className="has-floating-actions">
       <header className={`site-header ${menuOpen ? "menu-open" : ""}`}>
         <div className="header-inner">
           <Logo />
@@ -1347,7 +1408,6 @@ function App() {
       {!servicePage && isHome && <section className="intro section-dark" id="intro">
         <div className="container intro-grid">
           <div className="intro-copy reveal reveal-delay-1">
-            <SectionLabel>The Tunga approach</SectionLabel>
             <h2 className="line-reveal">
               <HeadlineLine>One studio.</HeadlineLine><HeadlineLine><em>Design through delivery.</em></HeadlineLine>
             </h2>
@@ -1363,15 +1423,12 @@ function App() {
 
       {!isNotFound && !servicePage && (isHome || activePage === "services") && <section className="services section-cream" id="services">
         <div className="container">
-          <div className={`section-heading reveal${activePage === "services" ? "" : " section-heading--home"}`}>
-            <SectionLabel>{activePage === "services" ? "Choose a service" : "What we do"}</SectionLabel>
-            {activePage === "services" ? (
-              <>
+          {activePage === "services" && (
+            <div className="section-heading reveal">
                 <h2 className="line-reveal"><HeadlineLine>A clear place</HeadlineLine><HeadlineLine><em>to start.</em></HeadlineLine></h2>
                 <p>Three ways we can help you make a space feel more like itself.</p>
-              </>
-            ) : null}
-          </div>
+            </div>
+          )}
           <div className="services-list">
             <article className="service-card reveal" onClick={() => { window.location.href = "/services/new-projects"; }} role="link" tabIndex={0}>
               <div className="service-visual image-reveal">
@@ -1515,10 +1572,11 @@ function App() {
         </div>
       </section>}
 
+      {!servicePage && isHome && <StudioStaggerGallery />}
+
       {!servicePage && activePage === "studio" && <section className="studio section-cream" id="studio">
         <div className="container studio-grid">
           <div className="studio-heading reveal">
-            <span className="eyebrow studio-kicker">THE STUDIO</span>
             <h2 className="line-reveal"><HeadlineLine>The last</HeadlineLine><HeadlineLine><em>10%.</em></HeadlineLine></h2>
           </div>
           <div className="studio-copy reveal reveal-delay-1">
@@ -1633,12 +1691,16 @@ function App() {
         </div>
       </footer>
 
-      {activePage !== "contact" && <div className="floating-actions">
-        <a className="floating-whatsapp" href={WHATSAPP_URL} target="_blank" rel="noreferrer" aria-label="Chat with Tunga Interiors on WhatsApp">
-          <MessageCircle size={20} strokeWidth={1.7} />
-          <span>WhatsApp us</span>
+      <div className="floating-actions" role="group" aria-label="Contact Tunga Interiors">
+        <a className="floating-call" href={`tel:+${TUNGA_MOBILE_RAW}`} aria-label={`Call Tunga Interiors at ${TUNGA_MOBILE}`}>
+          <Phone size={18} strokeWidth={1.8} />
+          <span>Call</span>
         </a>
-      </div>}
+        <a className="floating-whatsapp" href={floatingWhatsappUrl} target="_blank" rel="noreferrer" aria-label="Chat with Tunga Interiors on WhatsApp">
+          <MessageCircle size={20} strokeWidth={1.7} />
+          <span>WhatsApp</span>
+        </a>
+      </div>
       <QuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} initialService={quoteService} initialNotes={quoteNotes} />
     </main>
   );
