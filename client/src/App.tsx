@@ -407,54 +407,21 @@ const homeFaqItems = [
 ];
 
 const studioGalleryItems = [
-  { src: images.newProject, alt: "Warm living and dining room with timber furniture and soft natural light", width: 17, ratio: "3 / 4", top: 13, position: "50% 50%" },
-  { src: "/images/project/project bedroom design.webp", alt: "Bedroom with warm wood, soft lighting, and a sculpted feature wall", width: 20, ratio: "4 / 5", top: 11, position: "50% 50%" },
-  { src: "/images/service/b30dfbb81188ce47a135f51253b18d16.jpg", alt: "Living room with a green sofa, timber feature wall, and layered lighting", width: 24, ratio: "2 / 3", top: 0, position: "35% 50%" },
-  { src: "/images/service/73411ad36820e4e197f9530ba7fae030.jpg", alt: "Warm neutral salon with mirrors, timber details, and styling chairs", width: 22, ratio: "2 / 3", top: 3, position: "50% 50%" },
-  { src: "/images/service/1000b5392e3dda6eba85feeb7db47b36.jpg", alt: "Softly lit boardroom with a long timber table and neutral finishes", width: 17, ratio: "3 / 4", top: 13, position: "50% 50%" },
+  { src: images.newProject, alt: "Warm living and dining room with timber furniture and soft natural light", position: "50% 50%" },
+  { src: "/images/project/project bedroom design.webp", alt: "Bedroom with warm wood, soft lighting, and a sculpted feature wall", position: "50% 50%" },
+  { src: "/images/service/b30dfbb81188ce47a135f51253b18d16.jpg", alt: "Living room with a green sofa, timber feature wall, and layered lighting", position: "35% 50%" },
+  { src: "/images/service/73411ad36820e4e197f9530ba7fae030.jpg", alt: "Warm neutral salon with mirrors, timber details, and styling chairs", position: "50% 50%" },
+  { src: "/images/service/1000b5392e3dda6eba85feeb7db47b36.jpg", alt: "Softly lit boardroom with a long timber table and neutral finishes", position: "50% 50%" },
+  { src: projectImage("project bedroom.jpeg"), alt: "Bedroom in soft neutral finishes with warm wood details", position: "50% 50%" },
 ];
 
-function StudioStaggerGallery() {
-  const galleryRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const gallery = galleryRef.current;
-    if (!gallery || window.matchMedia("(prefers-reduced-motion: reduce), (pointer: coarse)").matches) return;
-
-    let frame = 0;
-    const updateParallax = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const viewportCenter = window.innerHeight / 2;
-        gallery.querySelectorAll<HTMLElement>(".studio-stagger-gallery-item").forEach((item, index) => {
-          const rect = item.getBoundingClientRect();
-          const distance = rect.top + rect.height / 2 - viewportCenter;
-          const drift = Math.max(-24, Math.min(24, distance * -0.035 * (0.55 + index * 0.12)));
-          item.style.setProperty("--parallax-y", `${drift}px`);
-        });
-      });
-    };
-
-    updateParallax();
-    window.addEventListener("scroll", updateParallax, { passive: true });
-    window.addEventListener("resize", updateParallax);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", updateParallax);
-      window.removeEventListener("resize", updateParallax);
-    };
-  }, []);
-
+function HomeStudioGallery() {
   return (
     <section className="studio-concepts" aria-label="Interior design concepts">
-      <div className="studio-stagger-gallery" ref={galleryRef}>
+      <div className="studio-image-grid">
         {studioGalleryItems.map((item) => (
-          <figure
-            className="studio-stagger-gallery-item image-reveal"
-            key={item.src}
-            style={{ flexGrow: item.width, aspectRatio: item.ratio, marginTop: `${item.top}%` }}
-          >
-            <img src={item.src} alt={item.alt} loading="lazy" decoding="async" sizes="(min-width: 1440px) 20vw, (min-width: 900px) 22vw, 62vw" style={{ objectPosition: item.position }} />
+          <figure className="studio-image-grid-item image-reveal" key={item.src}>
+            <img src={item.src} alt={item.alt} loading="lazy" decoding="async" sizes="(min-width: 900px) 33vw, (min-width: 620px) 50vw, 100vw" style={{ objectPosition: item.position }} />
           </figure>
         ))}
       </div>
@@ -1414,9 +1381,6 @@ function App() {
             <p>
               At Tunga Interiors, the people who design your space also carry it through execution. The approved design guides what gets installed.
             </p>
-            <a className="text-link" href="/studio">
-              Meet the studio <ArrowUpRight size={16} strokeWidth={1.4} />
-            </a>
           </div>
         </div>
       </section>}
@@ -1560,19 +1524,7 @@ function App() {
         </div>
       </section>}
 
-      {!servicePage && isHome && <section className="home-proof" aria-label="About Tunga Interiors">
-        <div className="container home-proof-inner">
-          <p className="home-proof-copy">
-            <strong>Founded by James Manzi in Kigali.</strong>
-            <span>One team from design through delivery.</span>
-          </p>
-          <a className="home-proof-link" href="/studio">
-            Meet the studio <ArrowUpRight size={16} strokeWidth={1.5} />
-          </a>
-        </div>
-      </section>}
-
-      {!servicePage && isHome && <StudioStaggerGallery />}
+      {!servicePage && isHome && <HomeStudioGallery />}
 
       {!servicePage && activePage === "studio" && <section className="studio section-cream" id="studio">
         <div className="container studio-grid">
@@ -1633,9 +1585,9 @@ function App() {
                 <SectionLabel>Start a project</SectionLabel>
                 <h2 className="line-reveal"><HeadlineLine>Tell us what you’re</HeadlineLine><HeadlineLine><em>building.</em></HeadlineLine></h2>
                 <p>Send a few details about your space and we’ll reply with next steps.</p>
-                <a className="button button-dark" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
-                  Start a project on WhatsApp <MessageCircle size={17} strokeWidth={1.5} />
-                </a>
+                <button className="button button-dark" type="button" onClick={() => openQuote()}>
+                  Request a project quote <ArrowUpRight size={17} strokeWidth={1.5} />
+                </button>
               </>
             ) : (
               <>
